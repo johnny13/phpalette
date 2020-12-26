@@ -1,56 +1,106 @@
 #!/usr/bin/env php
 <?php
 
+/**
+ * @abstract This is the main cli file that is called via the command line.
+ *           It displays a CLI Menu with selectable options that does a variety
+ *           of things, such as Wallpaper generation, wallpaper file management etc.
+ */
+
 declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use Art\Generate;
-use League\CLImate;
-use Intervention\Image\ImageManager;
-//use Imagine;
-use Imagine\Image\Box;
-use Imagine\Image\Point;
-//use Claviska\SimpleImage;
+// CLI HELPERS
+use PhpSchool\CliMenu\CliMenu;
+use PhpSchool\CliMenu\Builder\CliMenuBuilder;
+use PhpSchool\CliMenu\MenuItem\AsciiArtItem;
+use PhpSchool\CliMenu\Action\GoBackAction;
 
+use League\CLImate;
+
+// FORMAT HELPERS
 use \Dallgoot\Yaml;
 
-$imagine = new Imagine\Imagick\Imagine();
-$imgManager = new ImageManager(array('driver' => 'imagick'));
-$climate = new CLImate\CLImate;
+// PHP GOES TO ART SCHOOL
+use Art\Generate;
+use Art\Shapes;
 
+use Wallpaper\Rectangle;
+use Wallpaper\Circle;
+use Wallpaper\Raster;
+use Wallpaper\Generator;
+
+// USED IN THUMBNAIL GENERATION.
+// @TODO REMOVE THIS AND USE SIMPLEIMAGE
+use Intervention\Image\ImageManager;
+
+// ----------------------------------
+// PHP GLOBAL DECLARATIONS
+// ----------------------------------
 global $climate, $imagine, $imgManager;
+
+$imagine    = new Imagine\Imagick\Imagine();
+$imgManager = new ImageManager(array('driver' => 'imagick'));
+$climate    = new CLImate\CLImate;
+
+$wp_selected_themes = array();
 
 //
 // CLI Functions
 //
-function outputImg($img, $name)
+
+// Exit w/ error message
+function cliexit($enum = "0001")
+{
+    $climate = new CLImate\CLImate;
+
+    $climate->br();
+    $climate->red()->bold()->out("CMD ERROR #RTD" . $enum . "! EXITING");
+    $climate->br();
+    exit;
+    die();
+}
+
+// Output Result to Terminal
+function outputImg($img)
 {
     global $climate;
 
-    // Output Result to Terminal
     cliImgDisplay($img);
-    $climate->green()->out("Wallpaper saved to: " . $name);
+    $name = basename($img);
+    $climate->out("");
+    $climate->green()->out("     Wallpaper saved to: " . $name);
+    $climate->out("");
 }
 
+// Output message
 function outputLog($msg)
 {
     global $climate;
 
-    $climate->blue()->out($msg);
+    $climate->cyan()->out($msg);
     $climate->br();
 }
 
-function outputHeader()
+// Output ascii image + linebreak
+function outputHeader($ascii_file = "blasted_sm")
 {
     global $climate;
 
     $climate->addArt('ascii');
-    $climate->magenta()->boldDraw('huenity_small');
+
+    if ($ascii_file === "large") {
+        $climate->cyan()->boldDraw('spaceman');
+    } else if ($ascii_file === "evil") {
+        $climate->red()->boldDraw('skull');
+    } else {
+        $climate->draw($ascii_file);
+    }
+
     $climate->br();
 }
 
-//
 //  Displays an image in the terminal
 function cliImgDisplay($imagePath)
 {
@@ -67,7 +117,426 @@ function cliImgDisplay($imagePath)
     echo "\r\n" . $image;
 }
 
+// Debug logging helper
+function blastedFile($name, $content)
+{
+    $file = "out/" . $name;
+
+    file_put_contents($file, $content);
+
+    // register_shutdown_function(function() use($file) {
+    //     unlink($file);
+    // });
+
+    return $file;
+}
+
 //
+// File system helpers
+//
+
+// Compute size of directory
+function folderSize($dir)
+{
+    $size = 0;
+
+    foreach (glob(rtrim($dir, '/') . '/*', GLOB_NOSORT) as $each) {
+        $size += is_file($each) ? filesize($each) : folderSize($each);
+    }
+
+    return $size;
+}
+
+// Print KB MB etc
+function humanFilesize($bytes, $dec = 0)
+{
+    settype($bytes, "string");
+    $size   = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
+    $factor = floor((strlen($bytes) - 1) / 3);
+
+    return sprintf("%.{$dec}f", $bytes / pow(1024, $factor)) . @$size[$factor];
+}
+
+// Clear out Folder Contents
+function folderEmptyOut($path)
+{
+    $path = rtrim($path, "/");
+    $files = glob($path . '/*'); // get all file names
+    foreach ($files as $file) { // iterate files
+        if (is_file($file)) unlink($file);
+    }
+}
+
+//  Helper for getting relative directory of files as array
+function directoryToArray($dir, $typesString = "yaml,yml,YAML,YML")
+{
+    $files = array();
+    $total = 0;
+    foreach (glob("./" . $dir . "/*.{" . $typesString . "}", GLOB_BRACE) as $filename) {
+        $files[] = $filename;
+        $total++;
+    }
+
+    return $files;
+}
+
+
+//
+// CLI MENU FUNCTIONS
+//
+
+function genWallTodoUI($cli, $theme, $theme_type, $wjd, $walllist, $first = false, $final = false)
+{
+    $cli->clear();
+    $cli->br();
+
+    if ($first === false)
+        $cli->green()->boldDraw('blasted_colors');
+    else
+        $cli->green()->bold()->animation('blasted_colors')->enterFrom('top');
+
+    $cli->lightBlue()->bold()->out('  ' . strtoupper($theme_type) . ' THEME: <cyan>' . strtoupper($theme) . '</cyan>');
+    $cli->br();
+
+    $padding = $cli->padding(50);
+
+    $UsedCats = array();
+    foreach ($wjd["Wallpaper_Types"] as $wpt) {
+        foreach ($walllist as $walltxt) {
+            $UsedCats[] = strtolower($walltxt["category"]);
+        }
+    }
+
+    foreach ($wjd["Wallpaper_Types"] as $wpt) {
+
+        if (in_array(strtolower($wpt), $UsedCats)) {
+            $cli->cyan()->bold()->out("    " . strtoupper($wpt));
+            $cli->cyan()->out("    ====================================");
+        }
+
+        foreach ($walllist as $walltxt) {
+
+            if (!isset($walltxt["finished"]))
+                $wr = $walltxt["category"];
+            else
+                $wr = $walltxt["image"];
+
+            if (strtolower($wpt) === strtolower($walltxt["category"])) {
+                $padding->label("    " . $walltxt["name"])->result("[" . $wr . "]");
+                $cli->br();
+            }
+        }
+    }
+
+    // Generate Wallpaper TODO List
+    if ($final === true) {
+        $cli->br();
+        $cli->green()->bold()->out("    FINISHED! RELOAD IN [15] Seconds...");
+        $cli->br();
+
+        sleep(15);
+        $wallData = loadWallJSON();
+        cliMenuDisplay($wallData);
+    }
+}
+
+function menuFinalizedGenWallpapers($theme, $theme_type, $shuffle, $texture)
+{
+    global $climate, $wp_selected_themes;
+
+    // GRAB WALLPAPER DATA FILE
+    $wjd = loadWallJSON();
+
+    //
+    // CRAZY LOOPAGE
+    //
+    // FOR EACH USER SELECTED WALLPAPER STYLE,
+    // LOOK THROUGH ALL ITEMS IN data.json FOR MATCH.
+    // THEN EXECUTE FUNCTION FROM MATCHED ITEMS JSON DATA
+    $runtilldat = array();
+    foreach ($wp_selected_themes as $runCmd) {
+        foreach ($wjd["Wallpapers"] as $wItem) {
+            foreach ($wItem as $cat) {
+                foreach ($cat as $item) {
+                    if ($item["name"] === $runCmd)
+                        $runtilldat[] = array("name" => $item["name"], "category" => $item["category"], "function" => $item["function"], "params" => $item["params"]);
+                }
+            }
+        }
+    }
+
+    // OUTPUT SOME MENU SHIT
+    $climate->addArt('ascii');
+    genWallTodoUI($climate, $theme, $theme_type, $wjd, $runtilldat, true, false);
+
+    $progress = $climate->progress()->total(100);
+    $progress->current(10);
+
+    // Loop through runtilldat and run each command. 
+    // Updating Menu As you do.
+    $done = 0;
+    $rtd_count = 0;
+    while ($done === 0) {
+
+        // Run Each Wallpapers Function
+        $runit = runTillData($theme, $theme_type, $shuffle, $texture, $runtilldat, $rtd_count);
+
+
+        if ($done === 0) {
+            $runtilldat = $runit["result_array"];
+            genWallTodoUI($climate, $theme, $theme_type, $wjd, $runtilldat, false, false);
+        }
+
+        if (is_array($runit) && isset($runit["status"]))
+            $done = $runit["status"];
+
+        $progress->current($runit["progress"]);
+        $rtd_count++;
+        if ($rtd_count > 99) cliexit("991399");
+    }
+
+    // Finished Generating Wallpapers. Now Display Results.
+    genWallTodoUI($climate, $theme, $theme_type, $wjd, $runtilldat, false, true);
+    $progress->current(100);
+}
+
+function runTillData($theme, $theme_type, $shuffle, $texture, $funs, $i)
+{
+
+    $totalruns = count($funs);
+    $totalruns--;
+
+    $varfunk   = $funs[$i]["function"];
+    $varparams = $funs[$i]["params"];
+
+    /**
+     * @abstract Magic Variable Function Execution.
+     *           Function name found in JSON file is called w/ optional params.
+     * @link https://www.php.net/manual/en/functions.variable-functions.php
+     * @return array Contains resulting image & thumbnail 
+     */
+
+    $Jenny = new Generator();
+    $result = $Jenny->$varfunk($theme, $theme_type, $shuffle, $texture, $varparams);
+    // if ($varparams !== false && $varparams !== "false") {
+    //     $result = $Jenny->$varfunk($theme, $theme_type, $shuffle, $texture, $varparams);
+    // } else {
+    //     $result = $Jenny->$varfunk($theme, $theme_type, $shuffle, $texture);
+    // }
+
+    // Progress bar feedback info & Loop controller.
+    if ($totalruns === $i) {
+        $status = 1;
+        $progress = 99;
+    } else {
+        $status = 0;
+        $progress = intval(round(($i / $totalruns) * 90));
+    }
+
+    // Return Thumbnail from Variable Function we ran above this.
+    if (isset($result["thumbnail"]))
+        $funs[$i]["thumbnail"] = $result["thumbnail"];
+    else
+        $funs[$i]["thumbnail"] = "ERROR. WALLPAPER NOT CREATED";
+
+    // Return Image from Variable Function we ran above this.
+    if (isset($result["image"]))
+        $funs[$i]["image"] = $result["thumbnail"];
+    else
+        $funs[$i]["image"] = "ERROR. WALLPAPER NOT CREATED";
+
+    // Set this Wallpaper as Done in the UI.
+    $funs[$i]["finished"] = true;
+
+    $final = array("status" => $status, "progress" => $progress, "result_array" => $funs);
+    return $final;
+}
+
+function cliMenuDisplay($wpapers)
+{
+    global $wallpapers, $wp_selected_themes, $mainMenu;
+
+    $wallpapers = $wpapers["Wallpapers"];
+
+    $du1 = foldersize("out/walls");
+    $du2 = foldersize("out/wall_thumbs");
+    $du = round($du1 + $du2);
+    $disk_used = humanFilesize($du);
+
+    $art = file_get_contents("./ascii/spaceman.txt");
+
+    // Handels User Selection
+    $themeCallable = function (CliMenu $mainMenu) {
+        echo $mainMenu->getSelectedItem()->getText();
+    };
+
+    $wallpaperCallable  = function (CliMenu $mainMenu) {
+        global $wp_selected_themes;
+
+        $xclimate = new League\CLImate\CLImate;
+        $msg = $mainMenu->getSelectedItem()->getText();
+        $xclimate->magenta()->bold()->out("  SELECTED: " . $msg);
+        $wp_selected_themes[] = $msg;
+        $result = array_unique($wp_selected_themes);
+        $wp_selected_themes = $result;
+    };
+
+    $cleanCallable = function (CliMenu $clean) {
+        global $climate, $mainMenu;
+
+        $clean->confirm('For sure delete all generated wallpapers?')
+            ->display('OK!');
+
+        $dirs = array('out/walls/', 'out/wall_thumbs');
+        foreach ($dirs as $dir) { // iterate files
+            folderEmptyOut($dir);
+        }
+        $selectedItem = $mainMenu->getSelectedItem();
+        $selectedItem->hideItemExtra();
+
+
+        $mainMenu->redraw();
+    };
+
+    $colorCallable = function (CliMenu $menu) {
+
+        // They have Selected a Base16 Theme and some wallpapers to build.
+        // Close the main menu and bring up the Builder TUI. 
+        $shuffle = "";
+        $texture = "";
+
+        $wp_selected_theme = $menu->getSelectedItem()->getText();
+        $menu->close();
+
+        // Set Theme File Info for Wallpaper Generators...
+        $content = "base16," . $wp_selected_theme . "," . $shuffle . "," . $texture;
+        $name = "colorParams.txt";
+        blastedFile($name, $content);
+
+        menuFinalizedGenWallpapers($wp_selected_theme, "base16", $shuffle, $texture);
+    };
+
+    // Displays the menu
+    $mainMenu = ($builder = new CliMenuBuilder)
+        ->addAsciiArt($art, AsciiArtItem::POSITION_CENTER, "  --  BLASTED  --")
+        ->setTitleSeparator('nu')
+        ->addSubMenu('Generate Wallpapers', function (CliMenuBuilder $b) use ($wallpaperCallable, $colorCallable) {
+
+            global $wallpapers;
+
+            $b->setTitle('Select Wallpaper(s)');
+            $b->addLineBreak(' ');
+
+            foreach ($wallpapers as $wItem) {
+                foreach ($wItem as $cat) {
+                    foreach ($cat as $item) {
+                        $b->addCheckboxItem($item["name"], $wallpaperCallable);
+                    }
+                }
+                $b->addLineBreak(' ');
+            }
+
+            $b->addSubMenu('Next Step ->', function (CliMenuBuilder $c) use ($colorCallable) {
+
+                $c->setTitle('Select Color Palette')
+                    ->addLineBreak(' ')
+                    ->addSubMenu('Base16 Theme', function (CliMenuBuilder $d) use ($colorCallable) {
+
+                        $themes = loadAllBaseThemes();
+
+                        $d->setTitle('Available Base16 Themes')
+                            ->setTitleSeparator('nu')
+                            ->setPadding(2, 4)
+                            ->setMarginAuto()
+                            ->setForegroundColour('51')
+                            ->setBackgroundColour('240');
+
+                        $d->addLineBreak(' ');
+
+                        foreach ($themes as $theme) {
+                            $name = basename($theme, ".yaml");
+                            $d->addItem($name, $colorCallable);
+                        }
+
+                        $d->addLineBreak(' ');
+                        $d->addLineBreak(' ');
+                    })
+                    ->addLineBreak(' ')
+                    ->addItem('Manually Enter', function (CliMenu $menu) {
+                        echo sprintf('Executing option: %s', $menu->getSelectedItem()->getText());
+                    })
+                    ->addLineBreak(' ');
+            })
+                ->addLineBreak(' ');
+
+            $b->addSubMenu('Options', function (CliMenuBuilder $e) {
+                $e->setTitle('WALLPAPER OPTIONS')
+                    ->addLineBreak(' ')
+                    ->addLineBreak(' ')
+                    ->addItem('SHUFFLE COLORS? (default: false)', function (CliMenu $menu) {
+                        echo sprintf('SETTING OPTION: %s', $menu->getSelectedItem()->getText());
+                    })
+                    ->addLineBreak(' ')
+                    ->addItem('APPLY TEXTURE? (default: false)', function (CliMenu $menu) {
+                        echo sprintf('SETTING OPTION: %s', $menu->getSelectedItem()->getText());
+                    })
+                    ->addLineBreak(' ')
+                    ->addLineBreak('-');
+            })
+                ->addLineBreak(' ');
+        })
+        ->addItem('Cleanup Wallpaper Folders', $cleanCallable, true)
+        ->setItemExtra('[' . $disk_used . ']')
+        ->addItem('Add New Theme', $themeCallable)
+        ->addLineBreak('-')
+        ->addSubMenu('Options', function (CliMenuBuilder $e) {
+            $e->setTitle('WALLPAPER OPTIONS')
+                ->addLineBreak(' ')
+                ->addLineBreak(' ')
+                ->addItem('SHUFFLE COLORS? (default: false)', function (CliMenu $menu) {
+                    echo sprintf('SETTING OPTION: %s', $menu->getSelectedItem()->getText());
+                })
+                ->addLineBreak(' ')
+                ->addItem('APPLY TEXTURE? (default: false)', function (CliMenu $menu) {
+                    echo sprintf('SETTING OPTION: %s', $menu->getSelectedItem()->getText());
+                })
+                ->addLineBreak(' ')
+                ->addLineBreak('-');
+        })
+        ->setPadding(2, 4)
+        ->setMarginAuto()
+        ->setForegroundColour('51')
+        ->setBackgroundColour('240')
+        ->build();
+
+    $mainMenu->open();
+}
+
+
+//
+// Image Saving 
+//
+
+// Save a SimpleImage to Folder
+function saveNewWallpaper($SimpleImage, $nameString, $OUTDIR = "out/walls/")
+{
+
+    $THUMBWIDTH = "800";
+    $THUMBHEIGHT = "600";
+
+    $r_name = randomTxtString(5);
+    $f_name = $nameString . $r_name . '.png';
+    $t_name = "out/wall_thumbs/" . $f_name;
+
+    $SimpleImage->toFile($OUTDIR . $f_name, "image/png");
+
+    wallThumbnail($OUTDIR . $f_name, $THUMBWIDTH, $THUMBHEIGHT, $t_name);
+
+    //outputImg($t_name);
+
+    return array("thumbnail" => $t_name, "image" => $OUTDIR . $f_name);
+}
+
 //  Generates a smaller thumbnail from large image
 function wallThumbnail($wall, $wall_w, $wall_h, $thumb_name)
 {
@@ -76,17 +545,12 @@ function wallThumbnail($wall, $wall_w, $wall_h, $thumb_name)
     $scale_w = intval(round($wall_w * .5));
     $scale_h = intval(round($wall_h * .5));
 
-    outputLog("Creating Wallpaper Thumbnail...");
-
     $image = $imgManager->make($wall)->resize($scale_w, $scale_h);
     $image->save($thumb_name, 60);
-
-    outputLog($thumb_name);
 
     return true;
 }
 
-//
 //  Helper function for random filenames
 function randomTxtString($limit = 5)
 {
@@ -96,9 +560,13 @@ function randomTxtString($limit = 5)
     return $w_name;
 }
 
+
 //
+// Theme Color Loading
+//
+
 //  Load YAML Theme file
-function loadThemeFile($type = "base16", $shuffle = true)
+function loadThemeFile($type = "base16", $shuffle = true, $name = false)
 {
     $colors = array();
     $file   = "";
@@ -106,8 +574,26 @@ function loadThemeFile($type = "base16", $shuffle = true)
     $bgColor = backgroundColor("dark");
 
     if ($type === "base16") {
+
+        if ($name === false) {
+            $themes = array();
+
+            foreach (glob("./colors/*.{yaml,yml,YAML,YML}", GLOB_BRACE) as $filename) {
+                $themes[] = $filename;
+            }
+            shuffle($themes);
+
+            $name = "random";
+            $file = $themes[0];
+            $display_name = basename($file, "yaml");
+        } else {
+            $file = "./colors/" . $name . ".yaml";
+            $display_name = basename($file, "yaml");
+        }
+
+        outputLog("     <green>THEME</green> <light_blue>" . $display_name . "</light_blue>");
+
         $debug = 0;
-        $file = '/var/www/html/color/base16/base16-spectrum-generator/phpalette/colors/outrun-dark.yaml';
         $yaml = Yaml::parseFile($file, 0, $debug);
 
         $colors[] = $yaml->base08;
@@ -119,19 +605,43 @@ function loadThemeFile($type = "base16", $shuffle = true)
         $colors[] = $yaml->base0E;
         $colors[] = $yaml->base0F;
 
-        $bgColor = $yaml->base00;
+        $bgColor  = $yaml->base00;
     } else {
-        $colors = computeRectangleColors();
+        outputLog("ERROR! Theme Format not understood! Exiting :(");
+        die();
+        exit;
     }
 
     if ($shuffle === true) shuffle($colors);
-    //if (count($colors) > 6) array_splice(array_unique($colors), 0, 6);
 
-    $final = array("colors" => $colors, "background" => $bgColor);
+    $contents = array($display_name, $file, $shuffle, $bgColor);
+    $content = implode(" , ", $contents);
+    blastedFile("log.txt", $content);
+    $final = array("colors" => $colors, "background" => $bgColor, "theme" => $display_name);
     return $final;
 }
 
-//
+function loadAllBaseThemes()
+{
+    $themes = array();
+
+    foreach (glob("./colors/*.{yaml,yml,YAML,YML}", GLOB_BRACE) as $filename) {
+        $themes[] = $filename;
+    }
+
+    return $themes;
+}
+
+function loadWallJSON()
+{
+    $jfile = file_get_contents("src/data.json");
+    $json_wall = json_decode($jfile, true);
+    $walls = $json_wall["Wallpapers"];
+    $types = $json_wall["Wallpaper_Types"];
+
+    return array("Wallpapers" => $walls, "Wallpaper_Types" => $types);
+}
+
 // Default Black or White Background Color
 function backgroundColor($type = "dark")
 {
@@ -143,341 +653,121 @@ function backgroundColor($type = "dark")
 
 
 // 
-// Circle Wallpaper Functions
+// Other Wallpaper Functions
 //
-function compoundCircle($wallpaperImg, $colorPalette, $mainColor, $bgColor)
+
+function testAscii()
 {
-    $finalArray = array();
-
-    //Largest Color Circle
-    $circleSize   = rand(100, 400);
-
-    $bgRingSize   = rand(10, 45);
-    $circleSizeBG = round($circleSize - $bgRingSize);
-
-    $centerMaxSz  = intval(round($circleSizeBG - $bgRingSize));
-    if ($centerMaxSz < $bgRingSize) $centerMaxSz = intval(round($bgRingSize * 2));
-    $smRingSize   = rand($bgRingSize, $centerMaxSz);
-    if ($smRingSize < 20) $smRingSize = rand(20, $centerMaxSz);
-
-    // Generate Uniqe position for Circle
-    $limitX     = intval(round(1920 - $circleSize));
-    $circSpot_x = rand(0, $limitX); // 100px padding. 1920px max
-
-    $limitY     = intval(round(1080 - $circleSize));
-    $circSpot_y = rand(0, $limitY);
-
-    // $spots      = circleLocation($circleSize);
-    // $circSpot_x = $spots["spotX"];
-    // $circSpot_y = $spots["spotY"];
-
-    //Main Circle
-    $wallpaperImg->draw()
-        ->ellipse(
-            new Point($circSpot_x, $circSpot_y),
-            new Box($circleSize, $circleSize),
-            $colorPalette->color($mainColor),
-            true
-        );
-
-    //Inner bgColor Circle
-    $smXPos = round($circSpot_x + ($bgRingSize * 0.115));
-    $smYPos = round($circSpot_y + ($bgRingSize * 0.115));
-    $wallpaperImg->draw()
-        ->ellipse(
-            new Point($smXPos, $smYPos),
-            new Box($circleSizeBG, $circleSizeBG),
-            $colorPalette->color($bgColor),
-            true
-        );
-
-    outputLog("MC:" . $circleSize . "px @ X:" . $circSpot_x . " Y:" . $circSpot_y);
-    outputLog("BC:" . $circleSizeBG . "px @ X:" . $smXPos . " Y:" . $smYPos);
-
-    //Center Circle
-    $smstXPos = intval(round($smXPos + ($bgRingSize * 0.115)));
-    $smstYPos = intval(round($smYPos + ($bgRingSize * 0.115)));
-    $wallpaperImg->draw()
-        ->ellipse(
-            new Point($smstXPos, $smstYPos),
-            new Box($smRingSize, $smRingSize),
-            $colorPalette->color($mainColor),
-            true
-        );
-
-    $finalArray["size"] = $circleSize;
-    $finalArray["area"] = array("x" => $circSpot_x, "y" => $circSpot_y);
-
-    return $finalArray;
+    outputHeader("blasted_colors");
+    outputLog("Tested!");
 }
 
-function randomCircleData($cSize)
-{
-
-    global $paperWidth, $paperHeight;
-
-    $cData = array();
-
-    $paperWidthMax = intval(round($paperWidth - 100));
-    $paperHeightMax = intval(round($paperHeight - 40));
-
-    $cData["limitX"] = intval(round($paperWidthMax - $cSize));
-    $cData["spotX"]  = rand(100, $cData["limitX"]); // 100px padding. 1920px max
-    $cData["limitY"] = intval(round($paperHeightMax - $cSize));
-    $cData["spotY"]  = rand(40, $cData["limitY"]);
-
-    return $cData;
-}
-
-function circleLocation($cSize)
-{
-    global $allSizes;
-
-    if (count($allSizes) >= 1) {
-
-        $acceptable = false;
-        $logicPass  = 0;
-
-        while ($acceptable !== true) {
-
-            $circLoc = randomCircleData($cSize);
-
-            // If $circLoc[spotX] is in the range of X's 
-            // from known sizes in $allSizes, redo.
-            if ($circLoc["spotX"] === $allSizes["acceptableRange"]) {
-                $acceptable = true;
-            }
-
-            $logicPass++;
-            if ($logicPass > 50) $acceptable = true;
-        }
-    } else {
-        $circLoc = randomCircleData($cSize);
-    }
-
-    $allSizes[] = array("x" => $circLoc["spotX"], "y" => $circLoc["spotY"], "size" => $cSize);
-    return $circLoc;
-}
-
-function themeCircle($wallpaperImg, $colorPalette, $mainColor, $circleSize, $counter)
-{
-    global $paperWidth, $paperHeight, $circSpot_x;
-    $padding = 100;
-
-    if ($counter === 1) {
-        $circSpot_x = 100;
-    } else {
-        $circSpot_x = intval(round(($circleSize * $circSpot_x)));
-    }
-
-    $circSpot_y = intval(round(($paperHeight * 0.5)));
-
-    $wallpaperImg->draw()
-        ->ellipse(
-            new Point($circSpot_x, $circSpot_y),
-            new Box($circleSize, $circleSize),
-            $colorPalette->color($mainColor),
-            true
-        );
-
-    $fA = array("x" => $circSpot_x, "y" => $circSpot_y, "c" => $mainColor);
-    return $fA;
-}
-
-function circleWallpaper()
-{
-    global $imagine, $paperWidth, $paperHeight;
-
-    $paperWidth       = 1920;
-    $paperHeight      = 1080;
-
-    $allColors   = loadThemeFile("base16", false);
-
-    outputLog("Creating Imagine Image....");
-
-    $palette = new Imagine\Image\Palette\RGB();
-
-    $image   = $imagine->create(new Box($paperWidth, $paperHeight), $palette->color($allColors["background"]));
-
-    // Generate Compound Circle for each color in palette
-    $maxCs = count($allColors["colors"]);
-    $curCs = 1;
-    $paperWidthMax  = intval(round($paperWidth - 200));
-
-    $circleSize     = intval(round($paperWidthMax / $maxCs));
-
-    outputLog(count($allColors["colors"]) . " circles @ " . $circleSize) . "px each";
-
-    foreach ($allColors["colors"] as $themeColor) {
-        $tC = themeCircle($image, $palette, $themeColor, $circleSize, $curCs);
-        outputLog($tC["x"] . " " . $tC["y"] . " " . $curCs);
-        $curCs++;
-    }
-
-    // Name & Save Image
-    $w_name = randomTxtString(6);
-    $f_name = 'circ_' . $w_name . '.png';
-    $image->save('out/walls/' . $f_name);
-
-    // Thumbnail Img
-    $thumbPath = 'out/wall_thumbs/' . $f_name;
-    wallThumbnail('out/walls/' . $f_name, 800, 600, $thumbPath);
-
-    // Output Result to Terminal
-    outputImg($thumbPath, $f_name);
-}
-
-
-// 
-// Fractal Wallpaper Functions
-//
 function localGen()
 {
-    $wallpaper = new Generate();
+    $GenWall = new Generate();
 
-    outputLog("Creating Fractal Wallpaper.....");
-    $result = $wallpaper->makeFractal();
-    outputLog($result);
+    $result = $GenWall->makeFractal();
+    return $result;
 }
 
-
-//
-// ROUNDED RECTANGLES WALLPAPER
-//
-function computeRectSidePad($total_r)
-{
-    $side_pads = 4;
-
-    if ($total_r >= 6) {
-        $side_pads = 4;
-    } else if ($total_r < 6 && $total_r >= 4) {
-        $side_pads = 6;
-    } else {
-        $side_pads = 8;
-    }
-
-    return $side_pads;
-}
-
-function computeRectangles($width, $height, $padding, $total_r)
-{
-    $rect_pad = intval(round($padding * 2));         // total padding per rectangle (1 for each side)
-    $side_pad = computeRectSidePad($total_r);        // dynamic number of empty sections on each side
-
-    $total_s  = intval(round($total_r + $side_pad)); // ie 6 shapes + 4 empty sections
-
-    $s_width  = intval(round($width / $total_s));    // width of each section
-    $start_x  = intval(round($s_width * 2));         // start x coordinate
-
-    $r_width  = intval(round($s_width - $rect_pad));  // width of each rectangle (section width - total padding)
-
-    $y_pad    = intval(round($s_width * 1));
-    $r_height = intval(round($height - ($y_pad * 2)));
-
-    return array(
-        "rect_pad" => $rect_pad,
-        "side_pad" => $side_pad,
-        "total_s"  => $total_s,
-        "s_width"  => $s_width,
-        "start_x"  => $start_x,
-        "y_pad"    => $y_pad,
-        "r_height" => $r_height,
-        "r_width"  => $r_width
-    );
-}
-
-function computeRectangleColors()
-{
-    $colors = array();
-    $colors[] = "#05688f";
-    $colors[] = "#24799e";
-    $colors[] = "#535275";
-    $colors[] = "#02c59b";
-    $colors[] = "#ffd166";
-    $colors[] = "#540d6e";
-    $colors[] = "#1ae8ff";
-    $colors[] = "#8236ec";
-
-    shuffle($colors);
-    return $colors;
-}
-
-function makeRectangleWall()
+function superGen()
 {
     global $climate;
 
-    $width       = 1920;
-    $height      = 1080;
+    $GenWall = new Generate();
 
-    $allColors   = loadThemeFile("base16", false);
+    $imgFile = "examples/lips.png";
+    $html = $GenWall->grabColors($imgFile);
 
-    $padding     = (12 - count($allColors["colors"]));
-    $total_r     = count($allColors["colors"]);
-    $bgColor     = $allColors["background"];
-
-    // Build Rectangles
-    $r_data           = computeRectangles($width, $height, $padding, $total_r);
-    $r_data["colors"] = $allColors["colors"];
-    $roundness        = intval(round($r_data["r_width"] * 0.5));
-
-    // Log message
-    outputLog("Starting Rectangle Rendering...");
-
-    $image = new \claviska\SimpleImage();
-    $image
-        ->fromNew(1920, 1080, $bgColor)
-        ->autoOrient();
-
-    $current_x = 0;
-    for ($x = 0; $x < $total_r; $x++) {
-
-        $current_x = intval(round($current_x + $padding + $padding + $r_data["r_width"]));
-        if ($x === 0) $current_x = intval(round($r_data["start_x"] + $padding));
-
-        $current_x_stop = $current_x + $r_data["r_width"];
-        $current_y_stop = $r_data["y_pad"] + $r_data["r_height"];
-
-        $image->roundedRectangle(
-            $current_x,
-            $r_data["y_pad"],
-            $current_x_stop,
-            $current_y_stop,
-            $roundness,
-            $r_data["colors"][$x],
-            'filled'
-        );
-    }
-
-    $rs        = randomTxtString(5);
-    $w_name    = "rr_" . $rs . ".png";
-    $imagePath = 'out/walls/' . $w_name;
-    $thumbPath = 'out/wall_thumbs/' . $w_name;
-
-    // Save resulting image
-    $image->toFile($imagePath, 'image/png', 100);
-
-    // Create a thumbnail for whatever
-    wallThumbnail($imagePath, $width, $height, $thumbPath);
-
-    // Output resulting image to terminal
-    outputImg($thumbPath, $w_name);
+    file_put_contents("out/test.html", $html);
 }
 
+function avatarIconGen()
+{
+    $GenShape = new Shapes();
+    $avatar = new LasseRafn\InitialAvatarGenerator\InitialAvatar();
+    $image = $avatar->glyph('f6e2')->font('fonts/Font-Awesome-5-Free-Solid-900.otf')->color('#e0e0e0')->background('#4f4f4f')->size(256)->fontSize(0.75)->smooth()->generate();
+    return $image->save('examples/avatar.png');
+}
+
+function texturePrep()
+{
+    $GenRaster = new Raster();
+    $image = new \claviska\SimpleImage();
+
+    $GenRaster->makeReady($image);
+}
+
+function rasterGrungeGen()
+{
+    $GenWall = new Raster();
+    $image = new \claviska\SimpleImage();
+    $result = $GenWall->makeGrunge($image);
+    return $result;
+}
+
+// Turn image into greyscale version (used in textures)
+function makeGreyscale()
+{
+    if (!is_dir("./images/1920x1080/")) {
+        if (!mkdir("./images/1920x1080/", 0777, true)) {
+            die('Failed to create folders...');
+        }
+    }
+
+    $image = new \claviska\SimpleImage();
+
+    $dir = "images";
+    $typeString = "jpeg,jpg";
+    $textures = directoryToArray($dir, $typeString);
+
+    // Run the loop
+    foreach ($textures as $img) {
+
+        $bname = basename($img);
+
+        if (file_exists("images/1920x1080/" . $bname)) {
+            outPutLog("Already Processed " . $bname);
+        } else {
+
+            // Black and WHite Mode
+            outputLog("Oldschooling " . basename($img) . " like its Nick@Night");
+
+            $stripped = basename($img, '.jpg');
+
+            $image
+                ->fromFile($img)
+                ->resize(1920, 1080)
+                ->desaturate()
+                ->toFile("images/1920x1080/" . $stripped . ".png", 'image/png');
+        }
+    }
+
+    outputLog("Finished!");
+}
+
+// TODO LIST
+// @TODO ADD A PREPARE BASE16 THEME FUNCTION THAT REMOVES ANY COMMENTS AND FIXES FILE EXTENSION
+// @TODO ADD UI FOR FUNCTION THAT PREPARES RASTER IMAGES USED AS FILTERS
+// @TODO ADD ABILITY TO OVERLAY AN SVG IMAGE (IE LOGO) ONTO FINISHED WALLPAPER(S)
+// 
+// @TODO GENERATE COMPLEX WALLPAPERS THAT TAKE USER INPUT BEFORE CREATION
+// @TODO RASTER WALLPAPER IDEA (REPEATING ROW/COLUMNS OF SVG ICON(S))
+// 
 
 //
-//  ACTION CENTER
+//  MAIN MENU ACTIVATION
 //
+$wallData = loadWallJSON();
+cliMenuDisplay($wallData);
 
-outputHeader();
-//localGen();
-//imgManagerDrawing();
-
-//print_r(loadThemeFile());
-
-// Partially Works
-// Needs more options and coolness added
-circleWallpaper();
-
-// Generate rounded rectangle wallpaper based on color palette.
-// Displays the resulting image on the command line. 
-// makeRectangleWall();
+//testAscii();
+//
+//  Other Wallpaper Functions
+//
+    // rasterGrungeGen();
+    // makeGreyscale();
+    // texturePrep();
+    // localGen();
+    // superGen();
+    // avatarIconGen();

@@ -1,0 +1,78 @@
+{
+    "Wallpaper_Types": ["Circle", "Rectangle", "Raster"],
+    "Wallpapers": [{
+            "Circle": [{
+                    "name": "One Line Circle Span",
+                    "function": "inlineCircleGen",
+                    "params": false,
+                    "category": "circle"
+                },
+                {
+                    "name": "Random Circle Grid",
+                    "function": "rowsOfCircleGen",
+                    "params": false,
+                    "category": "circle"
+                },
+                {
+                    "name": "Rows & Rows of Circles",
+                    "function": "rowsOfCircleGen",
+                    "params": "solid",
+                    "category": "circle"
+                },
+                {
+                    "name": "Circle Bursts",
+                    "function": "burstCircleGen",
+                    "params": false,
+                    "category": "circle"
+                },
+                {
+                    "name": "Compound Circle Bursts",
+                    "function": "borderburstCircleGen",
+                    "params": false,
+                    "category": "circle"
+                },
+                {
+                    "name": "Rainbow Stack",
+                    "function": "stackCircleGen",
+                    "params": false,
+                    "category": "circle"
+                },
+                {
+                    "name": "Minimal Rings",
+                    "function": "stackLineCircleGen",
+                    "params": false,
+                    "category": "circle"
+                },
+                {
+                    "name": "Bunch of Random Dots",
+                    "function": "dotsGen",
+                    "params": false,
+                    "category": "circle"
+                }
+            ]
+        },
+        {
+            "Rectangle": [{
+                    "name": "Round Rectangles",
+                    "function": "roundRectGen",
+                    "params": false,
+                    "category": "rectangle"
+                },
+                {
+                    "name": "Round Rectangle Wave",
+                    "function": "roundRectGen",
+                    "params": "random",
+                    "category": "rectangle"
+                }
+            ]
+        },
+        {
+            "Raster": [{
+                "name": "Paint Splatters",
+                "function": "paintGen",
+                "params": false,
+                "category": "raster"
+            }]
+        }
+    ]
+}

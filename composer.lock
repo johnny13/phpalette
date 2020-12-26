@@ -4,20 +4,86 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e3d6b99cf55ca1e855190b628d786ff3",
+    "content-hash": "12ff452e878611d0f4e871981dfcdeef",
     "packages": [
         {
-            "name": "claviska/simpleimage",
-            "version": "3.3.5",
+            "name": "beberlei/assert",
+            "version": "v3.x-dev",
             "source": {
                 "type": "git",
-                "url": "https://github.com/claviska/SimpleImage.git",
-                "reference": "ae043784262e2ebc262d1b125509ef1fea1f1d5e"
+                "url": "https://github.com/beberlei/assert.git",
+                "reference": "d63a6943fc4fd1a2aedb65994e3548715105abcf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/claviska/SimpleImage/zipball/ae043784262e2ebc262d1b125509ef1fea1f1d5e",
-                "reference": "ae043784262e2ebc262d1b125509ef1fea1f1d5e",
+                "url": "https://api.github.com/repos/beberlei/assert/zipball/d63a6943fc4fd1a2aedb65994e3548715105abcf",
+                "reference": "d63a6943fc4fd1a2aedb65994e3548715105abcf",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ctype": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "ext-simplexml": "*",
+                "php": "^7"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "*",
+                "phpstan/phpstan-shim": "*",
+                "phpunit/phpunit": ">=6.0.0 <8"
+            },
+            "suggest": {
+                "ext-intl": "Needed to allow Assertion::count(), Assertion::isCountable(), Assertion::minCount(), and Assertion::maxCount() to operate on ResourceBundles"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Assert\\": "lib/Assert"
+                },
+                "files": [
+                    "lib/Assert/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de",
+                    "role": "Lead Developer"
+                },
+                {
+                    "name": "Richard Quadling",
+                    "email": "rquadling@gmail.com",
+                    "role": "Collaborator"
+                }
+            ],
+            "description": "Thin assertion library for input validation in business models.",
+            "keywords": [
+                "assert",
+                "assertion",
+                "validation"
+            ],
+            "support": {
+                "issues": "https://github.com/beberlei/assert/issues",
+                "source": "https://github.com/beberlei/assert/tree/v3"
+            },
+            "time": "2019-12-19T17:51:41+00:00"
+        },
+        {
+            "name": "claviska/simpleimage",
+            "version": "3.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/claviska/SimpleImage.git",
+                "reference": "ab2ab8a4672738ab77b39b00922ee4e79aeadb11"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/claviska/SimpleImage/zipball/ab2ab8a4672738ab77b39b00922ee4e79aeadb11",
+                "reference": "ab2ab8a4672738ab77b39b00922ee4e79aeadb11",
                 "shasum": ""
             },
             "require": {
@@ -43,13 +109,17 @@
                 }
             ],
             "description": "A PHP class that makes working with images as simple as possible.",
+            "support": {
+                "issues": "https://github.com/claviska/SimpleImage/issues",
+                "source": "https://github.com/claviska/SimpleImage/tree/3.5.1"
+            },
             "funding": [
                 {
                     "url": "https://github.com/claviska",
                     "type": "github"
                 }
             ],
-            "time": "2020-09-04T18:40:08+00:00"
+            "time": "2020-10-30T20:47:26+00:00"
         },
         {
             "name": "dallgoot/yaml",
@@ -104,6 +174,10 @@
                 "parser",
                 "yaml"
             ],
+            "support": {
+                "issues": "https://github.com/dallgoot/yaml/issues",
+                "source": "https://github.com/dallgoot/yaml/tree/v0.3.2"
+            },
             "time": "2020-01-08T19:03:03+00:00"
         },
         {
@@ -150,20 +224,24 @@
                 "cli",
                 "docs"
             ],
+            "support": {
+                "issues": "https://github.com/docopt/docopt.php/issues",
+                "source": "https://github.com/docopt/docopt.php/tree/1.0.4"
+            },
             "time": "2019-12-03T02:48:46+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "1.6.1",
+            "version": "1.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "239400de7a173fe9901b9ac7c06497751f00727a"
+                "reference": "f47ece9e6e8ce74e3be04bef47f46061dc18c095"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/239400de7a173fe9901b9ac7c06497751f00727a",
-                "reference": "239400de7a173fe9901b9ac7c06497751f00727a",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/f47ece9e6e8ce74e3be04bef47f46061dc18c095",
+                "reference": "f47ece9e6e8ce74e3be04bef47f46061dc18c095",
                 "shasum": ""
             },
             "require": {
@@ -176,15 +254,15 @@
             },
             "require-dev": {
                 "ext-zlib": "*",
-                "phpunit/phpunit": "~4.8.36 || ^5.7.27 || ^6.5.8"
+                "phpunit/phpunit": "~4.8.36 || ^5.7.27 || ^6.5.14 || ^7.5.20 || ^8.5.8 || ^9.3.10"
             },
             "suggest": {
-                "zendframework/zend-httphandlerrunner": "Emit PSR-7 responses"
+                "laminas/laminas-httphandlerrunner": "Emit PSR-7 responses"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.6-dev"
+                    "dev-master": "1.7-dev"
                 }
             },
             "autoload": {
@@ -221,28 +299,32 @@
                 "uri",
                 "url"
             ],
-            "time": "2019-07-01T23:21:34+00:00"
+            "support": {
+                "issues": "https://github.com/guzzle/psr7/issues",
+                "source": "https://github.com/guzzle/psr7/tree/1.x"
+            },
+            "time": "2020-12-08T11:45:39+00:00"
         },
         {
             "name": "imagine/imagine",
-            "version": "1.2.3",
+            "version": "1.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/avalanche123/Imagine.git",
-                "reference": "cb2361e5bb4410b681462d8e4f912bc5dabf84ab"
+                "reference": "d2e18be6e930ca169e4f921ef73ebfc061bf55d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/avalanche123/Imagine/zipball/cb2361e5bb4410b681462d8e4f912bc5dabf84ab",
-                "reference": "cb2361e5bb4410b681462d8e4f912bc5dabf84ab",
+                "url": "https://api.github.com/repos/avalanche123/Imagine/zipball/d2e18be6e930ca169e4f921ef73ebfc061bf55d8",
+                "reference": "d2e18be6e930ca169e4f921ef73ebfc061bf55d8",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.2"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "2.2.*",
-                "phpunit/phpunit": "^4.8 || ^5.7 || ^6.5 || ^7.5 || ^8.4"
+                "friendsofphp/php-cs-fixer": "^2.2",
+                "phpunit/phpunit": "^4.8 || ^5.7 || ^6.5 || ^7.5 || ^8.4 || ^9.3"
             },
             "suggest": {
                 "ext-gd": "to use the GD implementation",
@@ -279,7 +361,11 @@
                 "image manipulation",
                 "image processing"
             ],
-            "time": "2019-12-04T09:55:33+00:00"
+            "support": {
+                "issues": "https://github.com/avalanche123/Imagine/issues",
+                "source": "https://github.com/avalanche123/Imagine/tree/1.2.4"
+            },
+            "time": "2020-11-03T22:35:03+00:00"
         },
         {
             "name": "intervention/image",
@@ -349,6 +435,10 @@
                 "thumbnail",
                 "watermark"
             ],
+            "support": {
+                "issues": "https://github.com/Intervention/image/issues",
+                "source": "https://github.com/Intervention/image/tree/master"
+            },
             "time": "2019-11-02T09:15:47+00:00"
         },
         {
@@ -400,7 +490,175 @@
                 "console",
                 "shell"
             ],
+            "support": {
+                "issues": "https://github.com/kevinlebrun/colors.php/issues",
+                "source": "https://github.com/kevinlebrun/colors.php/tree/master"
+            },
             "time": "2018-05-30T08:34:23+00:00"
+        },
+        {
+            "name": "lasserafn/php-initial-avatar-generator",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/LasseRafn/php-initial-avatar-generator.git",
+                "reference": "49d0b10cc8819af831e0f6fb1056a7d5ed9512d0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/LasseRafn/php-initial-avatar-generator/zipball/49d0b10cc8819af831e0f6fb1056a7d5ed9512d0",
+                "reference": "49d0b10cc8819af831e0f6fb1056a7d5ed9512d0",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "intervention/image": "^2.3",
+                "lasserafn/php-initials": "^3.0",
+                "lasserafn/php-string-script-language": "^0.3.0",
+                "meyfa/php-svg": "^0.9.0",
+                "overtrue/pinyin": "^4.0",
+                "php": "^7.0|^7.1|^7.2|^7.3|^7.4|^8.0"
+            },
+            "require-dev": {
+                "doctrine/instantiator": "1.0.*",
+                "phpunit/phpunit": "^6.5",
+                "satooshi/php-coveralls": "^1.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "LasseRafn\\InitialAvatarGenerator\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lasse Rafn",
+                    "email": "lasserafn@gmail.com"
+                }
+            ],
+            "description": "A package to generate avatars with initials for PHP",
+            "keywords": [
+                "Initials",
+                "avatar",
+                "image",
+                "svg"
+            ],
+            "support": {
+                "issues": "https://github.com/LasseRafn/php-initial-avatar-generator/issues",
+                "source": "https://github.com/LasseRafn/php-initial-avatar-generator/tree/4.2.1"
+            },
+            "funding": [
+                {
+                    "url": "https://opencollective.com/ui-avatars",
+                    "type": "open_collective"
+                }
+            ],
+            "time": "2020-12-24T13:12:12+00:00"
+        },
+        {
+            "name": "lasserafn/php-initials",
+            "version": "3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/LasseRafn/php-initials.git",
+                "reference": "d287e1542687390eb68de779949bc0adc49e2d52"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/LasseRafn/php-initials/zipball/d287e1542687390eb68de779949bc0adc49e2d52",
+                "reference": "d287e1542687390eb68de779949bc0adc49e2d52",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.6|^7.0|^7.1|^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7",
+                "satooshi/php-coveralls": "^1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "LasseRafn\\Initials\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lasse Rafn",
+                    "email": "lasserafn@gmail.com"
+                }
+            ],
+            "description": "A package to generate initials in PHP",
+            "keywords": [
+                "Initials",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/LasseRafn/php-initials/issues",
+                "source": "https://github.com/LasseRafn/php-initials/tree/3.1"
+            },
+            "time": "2020-12-24T12:25:51+00:00"
+        },
+        {
+            "name": "lasserafn/php-string-script-language",
+            "version": "0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/LasseRafn/php-string-script-language.git",
+                "reference": "49a09d4a5e38c1e59a2656ac05b601d615c7cddb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/LasseRafn/php-string-script-language/zipball/49a09d4a5e38c1e59a2656ac05b601d615c7cddb",
+                "reference": "49a09d4a5e38c1e59a2656ac05b601d615c7cddb",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.6|^7.0|^7.1|^8.0"
+            },
+            "require-dev": {
+                "doctrine/instantiator": "1.0.5",
+                "phpunit/phpunit": "^5.6",
+                "phpunit/phpunit-mock-objects": "3.2.4",
+                "satooshi/php-coveralls": "^1.0",
+                "sebastian/exporter": "^1.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "LasseRafn\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lasse Rafn",
+                    "email": "lasserafn@gmail.com"
+                }
+            ],
+            "description": "Detect language/encoding of a string in PHP",
+            "keywords": [
+                "language",
+                "php",
+                "string"
+            ],
+            "support": {
+                "issues": "https://github.com/LasseRafn/php-string-script-language/issues",
+                "source": "https://github.com/LasseRafn/php-string-script-language/tree/0.3"
+            },
+            "time": "2020-12-24T12:43:59+00:00"
         },
         {
             "name": "lastguest/pixeler",
@@ -448,24 +706,28 @@
                 "render",
                 "utf8"
             ],
+            "support": {
+                "issues": "https://github.com/lastguest/pixeler/issues",
+                "source": "https://github.com/lastguest/pixeler/tree/master"
+            },
             "time": "2017-04-02T12:45:59+00:00"
         },
         {
             "name": "league/climate",
-            "version": "3.5.2",
+            "version": "3.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/climate.git",
-                "reference": "6b53a28a58ad9f5f63042e291eb870cf0d02a9c9"
+                "reference": "61eecbde7645528a855a3afef65c5354093b27b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/climate/zipball/6b53a28a58ad9f5f63042e291eb870cf0d02a9c9",
-                "reference": "6b53a28a58ad9f5f63042e291eb870cf0d02a9c9",
+                "url": "https://api.github.com/repos/thephpleague/climate/zipball/61eecbde7645528a855a3afef65c5354093b27b2",
+                "reference": "61eecbde7645528a855a3afef65c5354093b27b2",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1",
+                "php": "^7.2",
                 "psr/log": "^1.0",
                 "seld/cli-prompt": "^1.0"
             },
@@ -509,7 +771,11 @@
                 "php",
                 "terminal"
             ],
-            "time": "2019-12-01T15:25:43+00:00"
+            "support": {
+                "issues": "https://github.com/thephpleague/climate/issues",
+                "source": "https://github.com/thephpleague/climate/tree/3.6.0"
+            },
+            "time": "2020-10-04T16:02:59+00:00"
         },
         {
             "name": "league/color-extractor",
@@ -563,20 +829,24 @@
                 "image",
                 "palette"
             ],
+            "support": {
+                "issues": "https://github.com/thephpleague/color-extractor/issues",
+                "source": "https://github.com/thephpleague/color-extractor/tree/master"
+            },
             "time": "2016-12-15T09:30:02+00:00"
         },
         {
             "name": "league/flysystem",
-            "version": "1.1.3",
+            "version": "1.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "9be3b16c877d477357c015cec057548cf9b2a14a"
+                "reference": "13352d2303b67ecfc1306ef1fdb507df1a0fc79f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/9be3b16c877d477357c015cec057548cf9b2a14a",
-                "reference": "9be3b16c877d477357c015cec057548cf9b2a14a",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/13352d2303b67ecfc1306ef1fdb507df1a0fc79f",
+                "reference": "13352d2303b67ecfc1306ef1fdb507df1a0fc79f",
                 "shasum": ""
             },
             "require": {
@@ -648,38 +918,42 @@
                 "sftp",
                 "storage"
             ],
+            "support": {
+                "issues": "https://github.com/thephpleague/flysystem/issues",
+                "source": "https://github.com/thephpleague/flysystem/tree/1.x"
+            },
             "funding": [
                 {
                     "url": "https://offset.earth/frankdejonge",
                     "type": "other"
                 }
             ],
-            "time": "2020-08-23T07:39:11+00:00"
+            "time": "2020-12-24T14:42:48+00:00"
         },
         {
             "name": "league/glide",
-            "version": "1.6.0",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/glide.git",
-                "reference": "8759b8edfe953c8e6aceb45b3647fb7ae5349a0c"
+                "reference": "ae5e26700573cb678919d28e425a8b87bc71c546"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/glide/zipball/8759b8edfe953c8e6aceb45b3647fb7ae5349a0c",
-                "reference": "8759b8edfe953c8e6aceb45b3647fb7ae5349a0c",
+                "url": "https://api.github.com/repos/thephpleague/glide/zipball/ae5e26700573cb678919d28e425a8b87bc71c546",
+                "reference": "ae5e26700573cb678919d28e425a8b87bc71c546",
                 "shasum": ""
             },
             "require": {
                 "intervention/image": "^2.4",
                 "league/flysystem": "^1.0",
-                "php": "^7.2",
+                "php": "^7.2|^8.0",
                 "psr/http-message": "^1.0"
             },
             "require-dev": {
-                "mockery/mockery": "^1.2",
-                "phpunit/php-token-stream": "^3.1",
-                "phpunit/phpunit": "^8.5"
+                "mockery/mockery": "^1.3.3",
+                "phpunit/php-token-stream": "^3.1|^4.0",
+                "phpunit/phpunit": "^8.5|^9.0"
             },
             "type": "library",
             "extra": {
@@ -715,20 +989,24 @@
                 "manipulation",
                 "processing"
             ],
-            "time": "2020-07-07T12:23:45+00:00"
+            "support": {
+                "issues": "https://github.com/thephpleague/glide/issues",
+                "source": "https://github.com/thephpleague/glide/tree/1.7.0"
+            },
+            "time": "2020-11-05T17:34:03+00:00"
         },
         {
             "name": "league/mime-type-detection",
-            "version": "1.4.0",
+            "version": "1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/mime-type-detection.git",
-                "reference": "fda190b62b962d96a069fcc414d781db66d65b69"
+                "reference": "353f66d7555d8a90781f6f5e7091932f9a4250aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/mime-type-detection/zipball/fda190b62b962d96a069fcc414d781db66d65b69",
-                "reference": "fda190b62b962d96a069fcc414d781db66d65b69",
+                "url": "https://api.github.com/repos/thephpleague/mime-type-detection/zipball/353f66d7555d8a90781f6f5e7091932f9a4250aa",
+                "reference": "353f66d7555d8a90781f6f5e7091932f9a4250aa",
                 "shasum": ""
             },
             "require": {
@@ -756,6 +1034,10 @@
                 }
             ],
             "description": "Mime-type detection for Flysystem",
+            "support": {
+                "issues": "https://github.com/thephpleague/mime-type-detection/issues",
+                "source": "https://github.com/thephpleague/mime-type-detection/tree/1.5.1"
+            },
             "funding": [
                 {
                     "url": "https://github.com/frankdejonge",
@@ -766,25 +1048,325 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-08-09T10:34:01+00:00"
+            "time": "2020-10-18T11:50:25+00:00"
         },
         {
-            "name": "psr/http-message",
-            "version": "1.0.1",
+            "name": "mexitek/phpcolors",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/php-fig/http-message.git",
-                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363"
+                "url": "https://github.com/mexitek/phpColors.git",
+                "reference": "4b1ccc920b5fc3749a575c171d2f12fca0ecfded"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-message/zipball/f6561bf28d520154e4b0ec72be95418abe6d9363",
-                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363",
+                "url": "https://api.github.com/repos/mexitek/phpColors/zipball/4b1ccc920b5fc3749a575c171d2f12fca0ecfded",
+                "reference": "4b1ccc920b5fc3749a575c171d2f12fca0ecfded",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2"
+            },
+            "require-dev": {
+                "nette/tester": "^2.3",
+                "squizlabs/php_codesniffer": "^3.5"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Arlo Carreon",
+                    "homepage": "http://arlocarreon.com",
+                    "role": "creator"
+                }
+            ],
+            "description": "A series of methods that let you manipulate colors. Just incase you ever need different shades of one color on the fly.",
+            "homepage": "http://mexitek.github.com/phpColors/",
+            "keywords": [
+                "color",
+                "css",
+                "design",
+                "frontend",
+                "ui"
+            ],
+            "support": {
+                "issues": "https://github.com/mexitek/phpColors/issues",
+                "source": "https://github.com/mexitek/phpColors"
+            },
+            "time": "2020-11-05T06:04:47+00:00"
+        },
+        {
+            "name": "meyfa/php-svg",
+            "version": "v0.9.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/meyfa/php-svg.git",
+                "reference": "34401edef1f724898f468f71b85505fbcc8351bb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/meyfa/php-svg/zipball/34401edef1f724898f468f71b85505fbcc8351bb",
+                "reference": "34401edef1f724898f468f71b85505fbcc8351bb",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gd": "*",
+                "ext-simplexml": "*",
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "meyfa/phpunit-assert-gd": "^1.1",
+                "phpunit/phpunit": "^4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SVG\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabian Meyer",
+                    "homepage": "http://meyfa.net"
+                }
+            ],
+            "description": "Read, edit, write, and render SVG files with PHP",
+            "homepage": "https://github.com/meyfa/php-svg",
+            "keywords": [
+                "svg"
+            ],
+            "support": {
+                "issues": "https://github.com/meyfa/php-svg/issues",
+                "source": "https://github.com/meyfa/php-svg/tree/v0.9.1"
+            },
+            "time": "2019-07-30T18:41:25+00:00"
+        },
+        {
+            "name": "overtrue/pinyin",
+            "version": "4.0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/overtrue/pinyin.git",
+                "reference": "9836dae1783bcf5934508a2abe32eca9ea5ee15d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/overtrue/pinyin/zipball/9836dae1783bcf5934508a2abe32eca9ea5ee15d",
+                "reference": "9836dae1783bcf5934508a2abe32eca9ea5ee15d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "brainmaestro/composer-git-hooks": "^2.7",
+                "friendsofphp/php-cs-fixer": "^2.16",
+                "phpunit/phpunit": "~8.0"
+            },
+            "type": "library",
+            "extra": {
+                "hooks": {
+                    "pre-commit": [
+                        "composer test",
+                        "composer fix-style"
+                    ],
+                    "pre-push": [
+                        "composer test",
+                        "composer check-style"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Overtrue\\Pinyin\\": "src/"
+                },
+                "files": [
+                    "src/const.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "overtrue",
+                    "email": "anzhengchao@gmail.com",
+                    "homepage": "http://github.com/overtrue"
+                }
+            ],
+            "description": "Chinese to pinyin translator.",
+            "homepage": "https://github.com/overtrue/pinyin",
+            "keywords": [
+                "Chinese",
+                "Pinyin",
+                "cn2pinyin"
+            ],
+            "support": {
+                "issues": "https://github.com/overtrue/pinyin/issues",
+                "source": "https://github.com/overtrue/pinyin/tree/master"
+            },
+            "funding": [
+                {
+                    "url": "https://www.patreon.com/overtrue",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2020-04-13T08:53:30+00:00"
+        },
+        {
+            "name": "php-school/cli-menu",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-school/cli-menu.git",
+                "reference": "d25ae866d86b1ac95f026e7147c0e30ef4996dcd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-school/cli-menu/zipball/d25ae866d86b1ac95f026e7147c0e30ef4996dcd",
+                "reference": "d25ae866d86b1ac95f026e7147c0e30ef4996dcd",
+                "shasum": ""
+            },
+            "require": {
+                "beberlei/assert": "^2.4 | ^3",
+                "ext-mbstring": "*",
+                "ext-posix": "*",
+                "php": ">=7.1",
+                "php-school/terminal": "^0.2.1"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^0.12",
+                "phpunit/phpunit": "^8.0 | ^9.0",
+                "squizlabs/php_codesniffer": "^3.2"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PhpSchool\\CliMenu\\": "src"
+                },
+                "files": [
+                    "src/Util/ArrayUtils.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Woodward",
+                    "email": "mikeymike.mw@gmail.com"
+                },
+                {
+                    "name": "Aydin Hassan",
+                    "email": "aydin@hotmail.com"
+                }
+            ],
+            "description": "A command line menu helper in PHP",
+            "keywords": [
+                "cli",
+                "console",
+                "menu",
+                "php-school",
+                "phpschool",
+                "terminal"
+            ],
+            "support": {
+                "issues": "https://github.com/php-school/cli-menu/issues",
+                "source": "https://github.com/php-school/cli-menu/tree/4.1.0"
+            },
+            "time": "2020-10-24T09:18:48+00:00"
+        },
+        {
+            "name": "php-school/terminal",
+            "version": "0.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-school/terminal.git",
+                "reference": "725f86c7db996a4cf65648022f17e22391e97320"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-school/terminal/zipball/725f86c7db996a4cf65648022f17e22391e97320",
+                "reference": "725f86c7db996a4cf65648022f17e22391e97320",
+                "shasum": ""
+            },
+            "require": {
+                "ext-posix": "*",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^0.9.2",
+                "phpunit/phpunit": "^7.1",
+                "squizlabs/php_codesniffer": "^3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PhpSchool\\Terminal\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Woodward",
+                    "email": "mikeymike.mw@gmail.com"
+                },
+                {
+                    "name": "Aydin Hassan",
+                    "email": "aydin@hotmail.com"
+                }
+            ],
+            "description": "A command line terminal utility in PHP",
+            "keywords": [
+                "cli",
+                "console",
+                "php-school",
+                "phpschool",
+                "terminal"
+            ],
+            "support": {
+                "issues": "https://github.com/php-school/terminal/issues",
+                "source": "https://github.com/php-school/terminal/tree/0.2.1"
+            },
+            "time": "2019-12-17T21:56:06+00:00"
+        },
+        {
+            "name": "psr/http-message",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-message.git",
+                "reference": "efd67d1dc14a7ef4fc4e518e7dee91c271d524e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/efd67d1dc14a7ef4fc4e518e7dee91c271d524e4",
+                "reference": "efd67d1dc14a7ef4fc4e518e7dee91c271d524e4",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -816,25 +1398,29 @@
                 "request",
                 "response"
             ],
-            "time": "2016-08-06T14:39:51+00:00"
+            "support": {
+                "source": "https://github.com/php-fig/http-message/tree/master"
+            },
+            "time": "2019-08-29T13:16:46+00:00"
         },
         {
             "name": "psr/log",
-            "version": "1.1.3",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc"
+                "reference": "dd738d0b4491f32725492cf345f6b501f5922fec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/0f73288fd15629204f9d42b7055f72dacbe811fc",
-                "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/dd738d0b4491f32725492cf345f6b501f5922fec",
+                "reference": "dd738d0b4491f32725492cf345f6b501f5922fec",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -853,7 +1439,7 @@
             "authors": [
                 {
                     "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
+                    "homepage": "https://www.php-fig.org/"
                 }
             ],
             "description": "Common interface for logging libraries",
@@ -863,7 +1449,10 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2020-03-23T09:12:05+00:00"
+            "support": {
+                "source": "https://github.com/php-fig/log/tree/master"
+            },
+            "time": "2020-09-18T06:44:51+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -903,11 +1492,15 @@
                 }
             ],
             "description": "A polyfill for getallheaders.",
+            "support": {
+                "issues": "https://github.com/ralouphie/getallheaders/issues",
+                "source": "https://github.com/ralouphie/getallheaders/tree/develop"
+            },
             "time": "2019-03-08T08:55:37+00:00"
         },
         {
             "name": "seld/cli-prompt",
-            "version": "1.0.3",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/cli-prompt.git",
@@ -922,6 +1515,7 @@
             "require": {
                 "php": ">=5.3"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -951,31 +1545,35 @@
                 "input",
                 "prompt"
             ],
+            "support": {
+                "issues": "https://github.com/Seldaek/cli-prompt/issues",
+                "source": "https://github.com/Seldaek/cli-prompt/tree/1.0.3"
+            },
             "time": "2017-03-18T11:32:45+00:00"
         },
         {
             "name": "spatie/browsershot",
-            "version": "3.37.2",
+            "version": "3.41.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/browsershot.git",
-                "reference": "32d2984079ed8fe690f4dc5b7b6c205ae0a7b0fd"
+                "reference": "7cf6a641df376b6e7e1b9e8e1f92ecfc5e6893fa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/browsershot/zipball/32d2984079ed8fe690f4dc5b7b6c205ae0a7b0fd",
-                "reference": "32d2984079ed8fe690f4dc5b7b6c205ae0a7b0fd",
+                "url": "https://api.github.com/repos/spatie/browsershot/zipball/7cf6a641df376b6e7e1b9e8e1f92ecfc5e6893fa",
+                "reference": "7cf6a641df376b6e7e1b9e8e1f92ecfc5e6893fa",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1",
+                "php": "^7.4|^8.0",
                 "spatie/image": "^1.5.3",
                 "spatie/temporary-directory": "^1.1",
-                "symfony/process": "^4.2|^5.0"
+                "symfony/process": "^5.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6.1|^7.5",
-                "spatie/phpunit-snapshot-assertions": "^1.0"
+                "phpunit/phpunit": "^9.0",
+                "spatie/phpunit-snapshot-assertions": "^4.2.3"
             },
             "type": "library",
             "autoload": {
@@ -1007,41 +1605,44 @@
                 "screenshot",
                 "webpage"
             ],
+            "support": {
+                "issues": "https://github.com/spatie/browsershot/issues",
+                "source": "https://github.com/spatie/browsershot/tree/3.41.2"
+            },
             "funding": [
                 {
                     "url": "https://github.com/spatie",
                     "type": "github"
                 }
             ],
-            "time": "2020-07-21T22:40:58+00:00"
+            "time": "2020-12-23T10:14:56+00:00"
         },
         {
             "name": "spatie/image",
-            "version": "1.7.6",
+            "version": "1.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/image.git",
-                "reference": "74535b5fd67ace75840c00c408666660843e755e"
+                "reference": "6eaf45d61832c2396dd4b10cc81d9fce93a59e2d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/image/zipball/74535b5fd67ace75840c00c408666660843e755e",
-                "reference": "74535b5fd67ace75840c00c408666660843e755e",
+                "url": "https://api.github.com/repos/spatie/image/zipball/6eaf45d61832c2396dd4b10cc81d9fce93a59e2d",
+                "reference": "6eaf45d61832c2396dd4b10cc81d9fce93a59e2d",
                 "shasum": ""
             },
             "require": {
                 "ext-exif": "*",
                 "ext-mbstring": "*",
-                "league/glide": "^1.4",
-                "php": "^7.0",
-                "spatie/image-optimizer": "^1.0",
-                "spatie/temporary-directory": "^1.0.0",
+                "league/glide": "^1.6",
+                "php": "^7.2|^8.0",
+                "spatie/image-optimizer": "^1.1",
+                "spatie/temporary-directory": "^1.0",
                 "symfony/process": "^3.0|^4.0|^5.0"
             },
             "require-dev": {
-                "larapack/dd": "^1.1",
-                "phpunit/phpunit": "^6.0|^7.0",
-                "symfony/var-dumper": "^3.2|^5.0"
+                "phpunit/phpunit": "^8.0|^9.0",
+                "symfony/var-dumper": "^4.0|^5.0"
             },
             "type": "library",
             "autoload": {
@@ -1067,30 +1668,44 @@
                 "image",
                 "spatie"
             ],
-            "time": "2020-01-26T18:56:44+00:00"
+            "support": {
+                "issues": "https://github.com/spatie/image/issues",
+                "source": "https://github.com/spatie/image/tree/1.10.1"
+            },
+            "funding": [
+                {
+                    "url": "https://spatie.be/open-source/support-us",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2020-12-01T20:42:11+00:00"
         },
         {
             "name": "spatie/image-optimizer",
-            "version": "1.2.1",
+            "version": "1.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/image-optimizer.git",
-                "reference": "9c1d470e34b28b715d25edb539dd6c899461527c"
+                "reference": "6aa170eb292758553d332efee5e0c3977341080c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/image-optimizer/zipball/9c1d470e34b28b715d25edb539dd6c899461527c",
-                "reference": "9c1d470e34b28b715d25edb539dd6c899461527c",
+                "url": "https://api.github.com/repos/spatie/image-optimizer/zipball/6aa170eb292758553d332efee5e0c3977341080c",
+                "reference": "6aa170eb292758553d332efee5e0c3977341080c",
                 "shasum": ""
             },
             "require": {
                 "ext-fileinfo": "*",
-                "php": "^7.2",
+                "php": "^7.2|^8.0",
                 "psr/log": "^1.0",
                 "symfony/process": "^4.2|^5.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^8.0",
+                "phpunit/phpunit": "^8.0|^9.0",
                 "symfony/var-dumper": "^4.2|^5.0"
             },
             "type": "library",
@@ -1117,27 +1732,31 @@
                 "image-optimizer",
                 "spatie"
             ],
-            "time": "2019-11-25T12:29:24+00:00"
+            "support": {
+                "issues": "https://github.com/spatie/image-optimizer/issues",
+                "source": "https://github.com/spatie/image-optimizer/tree/1.3.2"
+            },
+            "time": "2020-11-28T12:37:58+00:00"
         },
         {
             "name": "spatie/temporary-directory",
-            "version": "1.2.4",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/temporary-directory.git",
-                "reference": "8efe8e61e0ca943d84341f10e51ef3a9606af932"
+                "reference": "f517729b3793bca58f847c5fd383ec16f03ffec6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/temporary-directory/zipball/8efe8e61e0ca943d84341f10e51ef3a9606af932",
-                "reference": "8efe8e61e0ca943d84341f10e51ef3a9606af932",
+                "url": "https://api.github.com/repos/spatie/temporary-directory/zipball/f517729b3793bca58f847c5fd383ec16f03ffec6",
+                "reference": "f517729b3793bca58f847c5fd383ec16f03ffec6",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2"
+                "php": "^7.2|^8.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^8.0"
+                "phpunit/phpunit": "^8.0|^9.0"
             },
             "type": "library",
             "autoload": {
@@ -1160,32 +1779,95 @@
             "description": "Easily create, use and destroy temporary directories",
             "homepage": "https://github.com/spatie/temporary-directory",
             "keywords": [
+                "php",
                 "spatie",
                 "temporary-directory"
             ],
-            "time": "2020-09-07T20:41:15+00:00"
+            "support": {
+                "issues": "https://github.com/spatie/temporary-directory/issues",
+                "source": "https://github.com/spatie/temporary-directory/tree/1.3.0"
+            },
+            "time": "2020-11-09T15:54:21+00:00"
         },
         {
-            "name": "symfony/polyfill-php80",
-            "version": "v1.18.1",
+            "name": "standaniels/image-generator",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/polyfill-php80.git",
-                "reference": "d87d5766cbf48d72388a9f6b85f280c8ad51f981"
+                "url": "https://github.com/standaniels/image-generator.git",
+                "reference": "f914d9d83701faa72b8f9876d3232ecad0131ce0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/d87d5766cbf48d72388a9f6b85f280c8ad51f981",
-                "reference": "d87d5766cbf48d72388a9f6b85f280c8ad51f981",
+                "url": "https://api.github.com/repos/standaniels/image-generator/zipball/f914d9d83701faa72b8f9876d3232ecad0131ce0",
+                "reference": "f914d9d83701faa72b8f9876d3232ecad0131ce0",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0.8"
+                "ext-exif": "*",
+                "ext-gd": "*",
+                "php": "^7.1"
             },
+            "require-dev": {
+                "mockery/mockery": "^1.0",
+                "phpunit/phpunit": "^6.1|^7.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "StanDaniels\\ImageGenerator\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stan Daniëls",
+                    "email": "mail@standaniels.nl",
+                    "homepage": "https://standaniels.nl",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A package to generate random images.",
+            "homepage": "https://github.com/standaniels/image-generator",
+            "keywords": [
+                "daniels",
+                "generator",
+                "image",
+                "random",
+                "stan"
+            ],
+            "support": {
+                "issues": "https://github.com/standaniels/image-generator/issues",
+                "source": "https://github.com/standaniels/image-generator/tree/1.0.1"
+            },
+            "time": "2020-05-07T14:02:15+00:00"
+        },
+        {
+            "name": "symfony/polyfill-php80",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-php80.git",
+                "reference": "3a11f3dfb34ad50f978cb2b8cf936933b87739aa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/3a11f3dfb34ad50f978cb2b8cf936933b87739aa",
+                "reference": "3a11f3dfb34ad50f978cb2b8cf936933b87739aa",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.18-dev"
+                    "dev-main": "1.21-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -1229,6 +1911,9 @@
                 "portable",
                 "shim"
             ],
+            "support": {
+                "source": "https://github.com/symfony/polyfill-php80/tree/main"
+            },
             "funding": [
                 {
                     "url": "https://symfony.com/sponsor",
@@ -1243,32 +1928,28 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-07-14T12:35:20+00:00"
+            "time": "2020-10-26T13:35:45+00:00"
         },
         {
             "name": "symfony/process",
-            "version": "v5.1.5",
+            "version": "5.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "1864216226af21eb76d9477f691e7cbf198e0402"
+                "reference": "bd8815b8b6705298beaa384f04fabd459c10bedd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/1864216226af21eb76d9477f691e7cbf198e0402",
-                "reference": "1864216226af21eb76d9477f691e7cbf198e0402",
+                "url": "https://api.github.com/repos/symfony/process/zipball/bd8815b8b6705298beaa384f04fabd459c10bedd",
+                "reference": "bd8815b8b6705298beaa384f04fabd459c10bedd",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2.5",
                 "symfony/polyfill-php80": "^1.15"
             },
+            "default-branch": true,
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "5.1-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "Symfony\\Component\\Process\\": ""
@@ -1293,6 +1974,9 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/process/tree/v5.2.1"
+            },
             "funding": [
                 {
                     "url": "https://symfony.com/sponsor",
@@ -1307,18 +1991,92 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-07-23T08:36:24+00:00"
+            "time": "2020-12-08T17:03:37+00:00"
+        },
+        {
+            "name": "talesoft/phim",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Talesoft/phim.git",
+                "reference": "065b4fac0ef9d7da6f638e5c95815f9fd924f98e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Talesoft/phim/zipball/065b4fac0ef9d7da6f638e5c95815f9fd924f98e",
+                "reference": "065b4fac0ef9d7da6f638e5c95815f9fd924f98e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.1"
+            },
+            "suggest": {
+                "gd": "for image processing with GD",
+                "imagick": "for image processing with Imagick",
+                "symfony/mbstring-polyfill": "if youre lacking the mbstring extension or can't install it"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "": "src/"
+                },
+                "files": [
+                    "src/Phim/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Torben Koehn",
+                    "email": "torben@talesoft.codes"
+                }
+            ],
+            "description": "An image and color manipulation and processing library for PHP",
+            "homepage": "http://phim.talesoft.codes",
+            "keywords": [
+                "CIEDE2000",
+                "cie",
+                "color",
+                "gd",
+                "hsl",
+                "hsv",
+                "image",
+                "imagick",
+                "lab",
+                "manipulation",
+                "processing"
+            ],
+            "support": {
+                "docs": "http://phim.talesoft.codes/docs",
+                "email": "torben@talesoft.codes",
+                "issues": "https://github.com/Talesoft/phim/issues",
+                "source": "https://github.com/Talesoft/phim"
+            },
+            "time": "2020-10-20T10:56:46+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": [],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "lasserafn/php-initial-avatar-generator": 20,
+        "mexitek/phpcolors": 20,
+        "php-school/cli-menu": 20,
+        "standaniels/image-generator": 20,
+        "talesoft/phim": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": "^7.1.3"
     },
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.0.0"
 }

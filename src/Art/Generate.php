@@ -8,6 +8,7 @@ class Generate
 {
 
     const OUTDIR = 'out/';
+    const EXDIR = 'examples/';
 
     public function scarytonHeader($climate)
     {
@@ -21,7 +22,9 @@ class Generate
     public function makeFractal(): string
     {
         $imgname = self::OUTDIR . "plasma_swirl.jpg";
+        $imgtwoname = self::EXDIR . "lips.png";
         shell_exec("convert -size 1080x920  plasma:fractal -blur 0x3 -swirl 180 -shave 20x20 " . $imgname);
+        shell_exec("convert -size 1080x920  plasma:fractal -blur 0x3 -swirl 180 -shave 20x20 " . $imgtwoname);
         return $imgname;
     }
 
@@ -66,11 +69,14 @@ class Generate
     {
         // $imgFile = 'filename.png'; 
         // sample usage: 
-        $palette = $this->colorPalette($imgFile, 10, 4);
-        echo "<table>\n";
-        foreach ($palette as $color) {
-            echo "<tr><td style='background-color:#$color;width:2em;'>&nbsp;</td><td>#$color</td></tr>\n";
+        $palette = $this->colorPalette($imgFile, 10, 2);
+        $rev = array_reverse($palette);
+        $html = "<table>\n";
+        foreach ($rev as $color) {
+            $html .= "<tr><td style='background-color:#$color;width:2em;'>&nbsp;</td><td>#$color</td></tr>\n";
         }
-        echo "</table>\n";
+        $html .= "</table>\n";
+
+        return $html;
     }
 }
