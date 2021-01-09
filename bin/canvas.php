@@ -32,7 +32,7 @@ use Wallpaper\Raster;
 use Wallpaper\Generator;
 
 // USED IN THUMBNAIL GENERATION.
-// @TODO REMOVE THIS AND USE SIMPLEIMAGE
+// @todo REMOVE THIS AND USE SIMPLEIMAGE
 use Intervention\Image\ImageManager;
 
 // ----------------------------------
@@ -46,9 +46,11 @@ $climate    = new CLImate\CLImate;
 
 $wp_selected_themes = array();
 
-//
-// CLI Functions
-//
+##========================================================================================
+##                                                                                      ##
+## CLI Functions                                                                        ##
+##                                                                                      ##
+##========================================================================================
 
 // Exit w/ error message
 function cliexit($enum = "0001")
@@ -131,9 +133,11 @@ function blastedFile($name, $content)
     return $file;
 }
 
-//
-// File system helpers
-//
+##========================================================================================
+##                                                                                      ##
+## File system helpers                                                                  ##
+##                                                                                      ##
+##========================================================================================
 
 // Compute size of directory
 function folderSize($dir)
@@ -145,6 +149,17 @@ function folderSize($dir)
     }
 
     return $size;
+}
+
+function folderItemCount($dir)
+{
+    $total = 0;
+
+    foreach (glob(rtrim($dir, '/') . '/*', GLOB_NOSORT) as $each) {
+        $total += is_file($each) ? 1 : 0;
+    }
+
+    return $total;
 }
 
 // Print KB MB etc
@@ -181,10 +196,26 @@ function directoryToArray($dir, $typesString = "yaml,yml,YAML,YML")
 }
 
 
-//
-// CLI MENU FUNCTIONS
-//
+##========================================================================================
+##                                                                                      ##
+## CLI MENU FUNCTIONS                                                                   ##
+## @abstract Controls the Display and Logic functions for building the ASCII menu.      ##
+##           As well as the generation of Color Palette themed Wallpaper images.        ##
+##                                                                                      ##
+##========================================================================================
 
+/**
+ * genWallTodoUI
+ * @abstract This displays the list of wallpapers being generated and updates as each wallpaper is created.
+ * @param [type] $cli
+ * @param [type] $theme
+ * @param [type] $theme_type
+ * @param [type] $wjd
+ * @param [type] $walllist
+ * @param boolean $first
+ * @param boolean $final
+ * @return void
+ */
 function genWallTodoUI($cli, $theme, $theme_type, $wjd, $walllist, $first = false, $final = false)
 {
     $cli->clear();
@@ -234,12 +265,23 @@ function genWallTodoUI($cli, $theme, $theme_type, $wjd, $walllist, $first = fals
         $cli->green()->bold()->out("    FINISHED! RELOAD IN [15] Seconds...");
         $cli->br();
 
-        sleep(15);
+        resetWallpaperMaker();
+        sleep(10);
         $wallData = loadWallJSON();
         cliMenuDisplay($wallData);
     }
 }
 
+/**
+ * menuFinalizedGenWallpapers
+ * @abstract Logic function that passes data from the function doing the generating, "runTIllData"
+ *           and the function doing the display, "genWallTodoUI".
+ * @param [type] $theme
+ * @param [type] $theme_type
+ * @param [type] $shuffle
+ * @param [type] $texture
+ * @return void
+ */
 function menuFinalizedGenWallpapers($theme, $theme_type, $shuffle, $texture)
 {
     global $climate, $wp_selected_themes;
@@ -291,8 +333,10 @@ function menuFinalizedGenWallpapers($theme, $theme_type, $shuffle, $texture)
             $done = $runit["status"];
 
         $progress->current($runit["progress"]);
+
+        // Failsafe incase things go FUBAR. Will kill the loop eventually. 
         $rtd_count++;
-        if ($rtd_count > 99) cliexit("991399");
+        if ($rtd_count > 50) cliexit("FUBAR069");
     }
 
     // Finished Generating Wallpapers. Now Display Results.
@@ -300,6 +344,17 @@ function menuFinalizedGenWallpapers($theme, $theme_type, $shuffle, $texture)
     $progress->current(100);
 }
 
+/**
+ * runTillData
+ * @abstract For a given set of Wallpaper templates & color palette, generates images.
+ * @param [type] $theme
+ * @param [type] $theme_type
+ * @param [type] $shuffle
+ * @param [type] $texture
+ * @param [type] $funs
+ * @param [type] $i
+ * @return void
+ */
 function runTillData($theme, $theme_type, $shuffle, $texture, $funs, $i)
 {
 
@@ -352,21 +407,36 @@ function runTillData($theme, $theme_type, $shuffle, $texture, $funs, $i)
     return $final;
 }
 
+/** 
+ *  cliMenuDisplay
+ *  @param array Wallpaper Template Data
+ *  @return ASCII UI Menu
+ */
 function cliMenuDisplay($wpapers)
 {
     global $wallpapers, $wp_selected_themes, $mainMenu;
 
     $wallpapers = $wpapers["Wallpapers"];
 
-    $du1 = foldersize("out/walls");
-    $du2 = foldersize("out/wall_thumbs");
-    $du = round($du1 + $du2);
-    $disk_used = humanFilesize($du);
+    $du1         = foldersize("out/walls");
+    $du2         = foldersize("out/wall_thumbs");
+    $du          = round($du1 + $du2);
+    $disk_used   = humanFilesize($du);
+    $countWalls  = folderItemCount("out/walls");
+    $countThemes = folderItemCount("out/themes");
 
     $art = file_get_contents("./ascii/spaceman.txt");
 
     // Handels User Selection
-    $themeCallable = function (CliMenu $mainMenu) {
+    $themeNewCallable = function (CliMenu $mainMenu) {
+        echo $mainMenu->getSelectedItem()->getText();
+    };
+
+    $themeEditCallable = function (CliMenu $mainMenu) {
+        echo $mainMenu->getSelectedItem()->getText();
+    };
+
+    $explorerCallable = function (CliMenu $mainMenu) {
         echo $mainMenu->getSelectedItem()->getText();
     };
 
@@ -420,13 +490,12 @@ function cliMenuDisplay($wpapers)
     $mainMenu = ($builder = new CliMenuBuilder)
         ->addAsciiArt($art, AsciiArtItem::POSITION_CENTER, "  --  BLASTED  --")
         ->setTitleSeparator('nu')
-        ->addSubMenu('Generate Wallpapers', function (CliMenuBuilder $b) use ($wallpaperCallable, $colorCallable) {
+        ->addSubMenu('Generate Wallpaper(s)', function (CliMenuBuilder $b) use ($wallpaperCallable, $colorCallable) {
 
             global $wallpapers;
 
-            $b->setTitle('Select Wallpaper(s)');
-            $b->addLineBreak(' ');
-
+            $b->setTitle('Select Wallpaper(s)')
+                ->addLineBreak(' ');
             foreach ($wallpapers as $wItem) {
                 foreach ($wItem as $cat) {
                     foreach ($cat as $item) {
@@ -487,7 +556,15 @@ function cliMenuDisplay($wpapers)
         })
         ->addItem('Cleanup Wallpaper Folders', $cleanCallable, true)
         ->setItemExtra('[' . $disk_used . ']')
-        ->addItem('Add New Theme', $themeCallable)
+        ->addItem('View Created Wallpapers', $cleanCallable, true)
+        ->setItemExtra('[' . $countWalls . ']')
+        ->addLineBreak(' ')
+        ->addItem('Build New Palette', $themeNewCallable)
+        ->addItem('Edit Saved Palette', $themeEditCallable, true)
+        ->setItemExtra('[' . $countThemes . ']')
+        ->addLineBreak(' ')
+        ->addItem('Color Explorer', $explorerCallable)
+        ->addLineBreak(' ')
         ->addLineBreak('-')
         ->addSubMenu('Options', function (CliMenuBuilder $e) {
             $e->setTitle('WALLPAPER OPTIONS')
@@ -512,12 +589,35 @@ function cliMenuDisplay($wpapers)
     $mainMenu->open();
 }
 
+/**
+ * resetWallpaperMaker
+ * @abstract Clears out any user selected options.
+ * @return array of nothing
+ */
+function resetWallpaperMaker()
+{
+    global $wp_selected_themes;
 
-//
-// Image Saving 
-//
+    $wp_selected_themes = array();
 
-// Save a SimpleImage to Folder
+    return $wp_selected_themes;
+}
+
+
+##========================================================================================
+##                                                                                      ##
+## Image Saving                                                                         ##
+##                                                                                      ##
+##========================================================================================
+
+/**
+ * saveNewWallpaper
+ * @abstract Save a SimpleImage to Folder
+ * @param [type] $SimpleImage
+ * @param [type] $nameString
+ * @param string $OUTDIR
+ * @return void
+ */
 function saveNewWallpaper($SimpleImage, $nameString, $OUTDIR = "out/walls/")
 {
 
@@ -537,7 +637,17 @@ function saveNewWallpaper($SimpleImage, $nameString, $OUTDIR = "out/walls/")
     return array("thumbnail" => $t_name, "image" => $OUTDIR . $f_name);
 }
 
-//  Generates a smaller thumbnail from large image
+/**
+ * wallThumbnail
+ * @todo This should be switched out for SimpleImage, instead of using a totally new dependency library.
+ *
+ * @abstract Generates a smaller thumbnail from large image
+ * @param [type] $wall
+ * @param [type] $wall_w
+ * @param [type] $wall_h
+ * @param [type] $thumb_name
+ * @return void
+ */
 function wallThumbnail($wall, $wall_w, $wall_h, $thumb_name)
 {
     global $imgManager;
@@ -551,7 +661,12 @@ function wallThumbnail($wall, $wall_w, $wall_h, $thumb_name)
     return true;
 }
 
-//  Helper function for random filenames
+/**
+ * randomTxtString
+ * @abstract Helper function for random filenames
+ * @param integer $limit
+ * @return void
+ */
 function randomTxtString($limit = 5)
 {
     $str = 'aAcCeEfFgGhHkKpPqQrRtTwWxXyYzZ234678';
@@ -561,11 +676,20 @@ function randomTxtString($limit = 5)
 }
 
 
-//
-// Theme Color Loading
-//
+##========================================================================================
+##                                                                                      ##
+## Theme Color Loading                                                                  ##
+##                                                                                      ##
+##========================================================================================
 
-//  Load YAML Theme file
+/**
+ * loadThemeFile
+ * @abstract Load YAML Theme file colors
+ * @param string $type
+ * @param boolean $shuffle
+ * @param boolean $name
+ * @return array CSS Color Strings & Background Color
+ */
 function loadThemeFile($type = "base16", $shuffle = true, $name = false)
 {
     $colors = array();
@@ -621,6 +745,11 @@ function loadThemeFile($type = "base16", $shuffle = true, $name = false)
     return $final;
 }
 
+/**
+ * loadAllBaseThemes
+ * @abstract Creates an array of all Base16 Themes locally stored in the colors directory. 
+ * @return array of Theme Files.
+ */
 function loadAllBaseThemes()
 {
     $themes = array();
@@ -632,6 +761,11 @@ function loadAllBaseThemes()
     return $themes;
 }
 
+/**
+ * loadWallJSON
+ * @abstract Loads a JSON file into memory with names & function calls for various Wallpaper types.
+ * @return void
+ */
 function loadWallJSON()
 {
     $jfile = file_get_contents("src/data.json");
@@ -642,7 +776,14 @@ function loadWallJSON()
     return array("Wallpapers" => $walls, "Wallpaper_Types" => $types);
 }
 
-// Default Black or White Background Color
+/**
+ * backgroundColor
+ * @todo Check if this can be removed. 
+ *
+ * @abstract Default Black or White Background Color. Debug function mostly. 
+ * @param string $type
+ * @return void
+ */
 function backgroundColor($type = "dark")
 {
     $color = "#0f0f0f";
@@ -652,9 +793,11 @@ function backgroundColor($type = "dark")
 }
 
 
-// 
-// Other Wallpaper Functions
-//
+##========================================================================================
+##                                                                                      ##
+## Testing & Brainstorming Functions                                                    ##
+##                                                                                      ##
+##========================================================================================
 
 function testAscii()
 {
@@ -746,14 +889,20 @@ function makeGreyscale()
     outputLog("Finished!");
 }
 
-// TODO LIST
-// @TODO ADD A PREPARE BASE16 THEME FUNCTION THAT REMOVES ANY COMMENTS AND FIXES FILE EXTENSION
-// @TODO ADD UI FOR FUNCTION THAT PREPARES RASTER IMAGES USED AS FILTERS
-// @TODO ADD ABILITY TO OVERLAY AN SVG IMAGE (IE LOGO) ONTO FINISHED WALLPAPER(S)
-// 
-// @TODO GENERATE COMPLEX WALLPAPERS THAT TAKE USER INPUT BEFORE CREATION
-// @TODO RASTER WALLPAPER IDEA (REPEATING ROW/COLUMNS OF SVG ICON(S))
-// 
+##========================================================================================
+##                                                                                      ##
+## TODO LIST                                                                            ##
+##                                                                                      ##
+##========================================================================================
+
+/**
+ * @todo ADD A PREPARE BASE16 THEME FUNCTION THAT REMOVES ANY COMMENTS AND FIXES FILE EXTENSION
+ * @todo ADD UI FOR FUNCTION THAT PREPARES RASTER IMAGES USED AS FILTERS
+ * @todo ADD ABILITY TO OVERLAY AN SVG IMAGE (IE LOGO) ONTO FINISHED WALLPAPER(S)
+ * @todo GENERATE COMPLEX WALLPAPERS THAT TAKE USER INPUT BEFORE CREATION
+ * @todo RASTER WALLPAPER IDEA (REPEATING ROW/COLUMNS OF SVG ICON(S))
+ * @todo RECTANGLE WALLPAPER SIMPLE ROW OF COLORED BLOCKS
+ */
 
 //
 //  MAIN MENU ACTIVATION
@@ -761,13 +910,15 @@ function makeGreyscale()
 $wallData = loadWallJSON();
 cliMenuDisplay($wallData);
 
-//testAscii();
+
 //
-//  Other Wallpaper Functions
+// Other Wallpaper Functions
 //
-    // rasterGrungeGen();
-    // makeGreyscale();
-    // texturePrep();
-    // localGen();
-    // superGen();
-    // avatarIconGen();
+
+// testAscii();
+// rasterGrungeGen();
+// makeGreyscale();
+// texturePrep();
+// localGen();
+// superGen();
+// avatarIconGen();
