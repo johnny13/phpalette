@@ -10,7 +10,7 @@
                 {
                     "name": "Random Circle Grid",
                     "function": "rowsOfCircleGen",
-                    "params": false,
+                    "params": "random",
                     "category": "circle"
                 },
                 {

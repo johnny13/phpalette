@@ -9,6 +9,14 @@ use Imagine\Image\Palette\RGB;
 use Imagine\Image\Box;
 use Imagine\Image\Point;
 
+/**
+ * Circle
+ * @abstract This class builds out Circle Themed wallpapers. There are a number of different templates some with a few circles some with quite a few circles. Some classes can be thrown an optional parameter to randomize the color &/or location of the circles.
+ *
+ * @todo The function "uniqueX" needs to do a better job of checking if a RANGE of values is present not a specific point.
+ * @todo The function "circleLocation" checks if the newly generated value is between two values from an array of previously used positions. It should do a better job and loop through the array instead of taking the min and max values from the array.
+ *
+ */
 class Circle
 {
 
@@ -19,7 +27,13 @@ class Circle
     const THUMBWIDTH   = 800;
     const THUMBHEIGHT  = 600;
     const BORDERSIZE   = 40;
+    const BORDERMID    = 150;
+    const BORDERIN     = 50;
     const BBMOVE       = 250;
+    const STACKMIN     = 600;
+    const STACKMAX     = 750;
+    const SMALLGAP     = 5;
+    const INLINESPACE  = 200;
 
     protected $mainSize;
     protected $circSpot_x;
@@ -43,11 +57,11 @@ class Circle
         wallThumbnail(self::OUTDIR . $f_name, self::THUMBWIDTH, self::THUMBHEIGHT, self::THUMBDIR . $f_name);
         outputImg(self::THUMBDIR . $f_name);
 
-        return array("image"=>self::OUTDIR . $f_name,"thumbnail"=>self::THUMBDIR . $f_name);
+        return array("image" => self::OUTDIR . $f_name, "thumbnail" => self::THUMBDIR . $f_name);
     }
 
     // For given params, draw colored circle to image
-    public function drawColoredCircle($wallpaperImage, $wallpaperPalette, $cX, $cY, $cSize, $cColor, $fill=true)
+    public function drawColoredCircle($wallpaperImage, $wallpaperPalette, $cX, $cY, $cSize, $cColor, $fill = true)
     {
         $wallpaperImage->draw()
             ->ellipse(
@@ -64,17 +78,16 @@ class Circle
     //
     public function stackedCircle($wImg, $colorPalette, $color, $Counter, $X, $Y, $fill)
     {
-        if($Counter < 0){
-            $S = intval(600);
+        if ($Counter < 0) {
+            $S = intval(self::STACKMIN);
         } else {
             $multiplier = "1." . $Counter;
             $multitwo = "0." . $Counter;
             settype($multiplier, "float");
             settype($multitwo, "float");
-            $S = intval((750 * $multiplier) + (750 * $multitwo));
+            $S = intval((self::STACKMAX * $multiplier) + (self::STACKMAX * $multitwo));
         }
-        //outputLog($S);
-        
+
         $this->drawColoredCircle($wImg, $colorPalette, $X, $Y, $S, $color, $fill);
     }
 
@@ -88,10 +101,17 @@ class Circle
         return $cData;
     }
 
-    // Where we are printing out the compound circle
+    /**
+     * circleLocation
+     *
+     * @param [type] $cSize Int How big of circle we are making
+     * @return object of coordinates to plot on grid
+     * @todo do a better job of not returning used up areas, to avoid overlapping
+     */
     public function circleLocation($cSize)
     {
         //global $allSizes;
+        //outputLog("Circle Location. Size:" . $cSize);
 
         if (is_array($this->allSizes) && count($this->allSizes) >= 1) {
 
@@ -101,12 +121,26 @@ class Circle
             while ($acceptable !== true) {
 
                 $circLoc = $this->randomCircleData($cSize);
-                $min = reset($this->xRangers);
+                asort($this->xRangers);
+                $min = array_values($this->xRangers)[0];
                 $max = end($this->xRangers);
-                if (($min <= $circLoc["spotX"]) && ($circLoc["spotX"] <= $max)) $acceptable = true;
+                $tempRanges = range($min, $max);
+
+                if (!in_array($circLoc["spotX"], $tempRanges)) {
+                    $acceptable = true;
+                    //outputLog("min" . $min . " max" . $max . " x" . $circLoc["spotX"]);
+                }
 
                 $logicPass++;
-                if ($logicPass > 500) $acceptable = true;
+                if ($logicPass > 50 && $acceptable !== true) {
+                    outputLog("Limit Reached");
+                    outputLog($min . " " . $max);
+                    $acceptable = true;
+                    $this->xRangers = array();
+                    $this->xRangers[] = $min;
+                    $this->xRangers[] = $max;
+                    $logicPass = 0;
+                }
             }
         } else {
             $circLoc = $this->randomCircleData($cSize);
@@ -124,11 +158,11 @@ class Circle
         $minPoint = intval($xPoint - $halfSize);
         $maxPoint = intval($xPoint + $halfSize);
 
-        if ($minPoint < intval(round(self::WALLWIDTH - $size)))
-            $minPoint = 0;
+        if ($minPoint <= 0)
+            $minPoint = intval($halfSize);
 
-        if ($maxPoint < intval(round(self::WALLWIDTH + $size)))
-            $maxPoint = self::WALLWIDTH;
+        if ($maxPoint >= intval(self::WALLWIDTH))
+            $maxPoint = intval(self::WALLWIDTH - $halfSize);
 
         $this->xRangers[] = $minPoint;
         $this->xRangers[] = $maxPoint;
@@ -139,12 +173,12 @@ class Circle
     public function inlineCircle($wImg, $colorPalette, $mainColor, $circleSize, $counter)
     {
         if ($counter === 1)
-            $this->circSpot_x = intval(round($circleSize));
+            $this->circSpot_x = self::INLINESPACE;
         else
             $this->circSpot_x = intval(round(($circleSize + $this->circSpot_x)));
 
         $circSpot_y = intval(round((self::WALLHEIGHT * 0.5)));
-        $modSize = intval(round($circleSize - 5));
+        $modSize = intval(round($circleSize - self::SMALLGAP));
 
         $this->drawColoredCircle($wImg, $colorPalette, $this->circSpot_x, $circSpot_y, $modSize, $mainColor);
 
@@ -208,8 +242,8 @@ class Circle
         $bInSize    = intval(round($this->mainSize * (($tcs - $bbP["counter"]) * .1)));
         $cInSize    = intval(round($bInSize * (($tcs - $bbP["counter"]) * .1)));
 
-        if ($bInSize < 150) $bInSize = 150;
-        if ($cInSize < 50) $cInSize = 50;
+        if ($bInSize < self::BORDERMID) $bInSize = self::BORDERMID;
+        if ($cInSize < self::BORDERIN) $cInSize = self::BORDERIN;
 
         // Compute Circle Location
         $spots = $this->circleLocation($cSize);
@@ -285,43 +319,52 @@ class Circle
     public function computeMovement($size)
     {
 
-        $loc     = array();
-        $qsize = intval(round($size * 5));
-        $psize = intval(intval(5 * $size) + $size);
+        $loc   = array();
+        $qsize = intval(1.5 * $size);
+        $psize = intval(intval(rand(1, 4)) * $size);
 
         //$moveVal = intval(round($size + intval($size * intval(0.1 * rand(1, 3)))));
         //$wiggle  = intval(rand(-250, 250));
+        $locCheck = false;
+        $lcC = 0;
+        while ($locCheck === false) {
+            $moveVal = intval(rand(intval(-1 * $psize), $psize));
+            $wiggle  = intval(rand(intval(-1 * $qsize), $qsize));
 
-        $moveVal = intval(rand(intval(-1 * $psize), $psize));
-        $wiggle  = intval(rand(intval(-1 * $qsize), $qsize));
+            //outputLog("Moving:" . $this->dirMove);
 
-        //outputLog("Moving:" . $this->dirMove);
+            switch ($this->dirMove) {
+                case "up":
+                    $loc["x"] = intval($this->circSpot_x + $wiggle);
+                    $loc["y"] = intval(round($this->circSpot_y + $moveVal));
+                    break;
+                case "down":
+                    $loc["x"] = intval($this->circSpot_x - $wiggle);
+                    $loc["y"] = intval(round($this->circSpot_y - $moveVal));
+                    break;
+                case "left":
+                    $loc["x"] = intval(round($this->circSpot_x - $moveVal));
+                    $loc["y"] = intval($this->circSpot_y - $wiggle);
+                    break;
+                case "right":
+                    $loc["x"] = intval(round($this->circSpot_x + $moveVal));
+                    $loc["y"] = intval($this->circSpot_y + $wiggle);
+                    break;
+            }
 
-        switch ($this->dirMove) {
-            case "up":
-                $loc["x"] = intval($this->circSpot_x + $wiggle);
-                $loc["y"] = intval(round($this->circSpot_y + $moveVal));
-                $nextMove = array("down", "left", "right");
-                break;
-            case "down":
-                $loc["x"] = intval($this->circSpot_x - $wiggle);
-                $loc["y"] = intval(round($this->circSpot_y - $moveVal));
-                $nextMove = array("up", "left", "right");
-                break;
-            case "left":
-                $loc["x"] = intval(round($this->circSpot_x - $moveVal));
-                $loc["y"] = intval($this->circSpot_y - $wiggle);
-                $nextMove = array("down", "up", "right");
-                break;
-            case "right":
-                $loc["x"] = intval(round($this->circSpot_x + $moveVal));
-                $loc["y"] = intval($this->circSpot_y + $wiggle);
-                $nextMove = array("down", "left", "up");
-                break;
+            if ((($loc["x"] > 0) && ($loc["x"] < self::WALLWIDTH)) && (($loc["y"] > 0) && ($loc["y"] < self::WALLHEIGHT)))
+                $locCheck = true;
+
+            $lcC++;
+            if ($lcC > 50) {
+                $locCheck = true;
+            }
         }
 
-        shuffle($nextMove);
-        $this->dirMove = $nextMove[0];
+
+        $directions = array("up", "down", "left", "right");
+        shuffle($directions);
+        $this->dirMove = $directions[0];
 
         //outputLog("Moved x@" . $loc["x"] . " y@" . $loc["y"]);
         return $loc;
@@ -338,53 +381,39 @@ class Circle
             $directions = array("up", "down", "left", "right");
             shuffle($directions);
             $this->dirMove = $directions[0];
-
-            $this->circSpot_x = $loc["x"];
-            $this->circSpot_y = $loc["y"];
         } else {
 
             $moveCheck = false;
-            $moveCount = 0;
-
-            //outputLog("prevX:" . $this->circSpot_x . "prevY:" . $this->circSpot_y);
+            $mcC = 0;
 
             while ($moveCheck === false) {
-                $locAmount = $this->computeMovement($size);
+                $lastMove = $this->dirMove;
+                $loc = $this->computeMovement($size);
+                $sSize = intval($size * 1.2);
 
-                $loc["x"] = $locAmount["x"];
-                $loc["y"] = $locAmount["y"];
+                if ($lastMove === "up" && $loc["x"] > intval($this->circSpot_x + $sSize))
+                    $moveCheck = true;
 
-                if (
-                    ($loc["x"] > 0 && $loc["x"] < self::WALLWIDTH) &&
-                    ($loc["y"] > 0 && $loc["y"] < self::WALLHEIGHT)
-                ) {
-                    $sSize = intval($size * 2);
-                    if ($this->dirMove === "up") {
-                        if ($loc["x"] > intval($this->circSpot_x + $sSize)) {
-                            $moveCheck = true;
-                        }
-                    }
-                    if ($this->dirMove === "down") {
-                        if ($loc["x"] < intval($this->circSpot_x + $sSize)) {
-                            $moveCheck = true;
-                        }
-                    }
-                    if ($this->dirMove === "left") {
-                        if ($loc["y"] > intval($this->circSpot_y + $sSize)) {
-                            $moveCheck = true;
-                        }
-                    }
-                    if ($this->dirMove === "right") {
-                        if ($loc["y"] < intval($this->circSpot_y + $sSize)) {
-                            $moveCheck = true;
-                        }
-                    }
+                if ($lastMove === "down" && $loc["x"] < intval($this->circSpot_x - $sSize))
+                    $moveCheck = true;
+
+                if ($lastMove === "left" && $loc["y"] > intval($this->circSpot_y + $sSize))
+                    $moveCheck = true;
+
+                if ($lastMove === "right" && $loc["y"] < intval($this->circSpot_y - $sSize))
+                    $moveCheck = true;
+
+                $mcC++;
+                //outputLog("dir: " . $lastMove . " size: " . $sSize . " x: " . $loc["x"] . " y: " . $loc["y"]);
+                if ($mcC > 50) {
+                    $moveCheck = true;
+                    outputLog(" ");
+                    outputLog("Move  Limit!");
+                    outputLog(" ");
+                    $loc["x"] = intval(rand(0, self::WALLWIDTH));
+                    $loc["y"] = intval(rand(0, self::WALLHEIGHT));
                 }
-
-                //if ($moveCount > 100) $moveCheck = true;
-                $moveCount++;
             }
-            //outputLog("newX:" . $this->circSpot_x . "newY:" . $this->circSpot_y);
         }
 
         $this->circSpot_x = $loc["x"];
@@ -418,6 +447,10 @@ class Circle
 
             if (($bInSize > $cInSize && $cInSize > 0)) $sizeCheck = true;
             $sCC++;
+            if ($sCC > 50) {
+                $sizeCheck = true;
+                outputLog("Size Check Limit Reached.");
+            }
         }
 
         $sizes["main"]   = $mSize;
@@ -463,7 +496,7 @@ class Circle
         $tenMax     = intval(round(self::WALLHEIGHT / 10));
 
         while ($tenCount <= $tenMax) {
-            $this->circSpot_x = intval(round($circleSize*0.5));
+            $this->circSpot_x = intval(round($circleSize * 0.5));
 
             $rowCount = 0;
             $rowMax   = 9;
@@ -474,9 +507,9 @@ class Circle
                 if ($tCCount > $tCRange) $blackOut = true;
 
                 if ($rowCount > 0) $this->circSpot_x = intval(round(($circleSize + $this->circSpot_x)));
-                if ($tenCount > 0) 
-                    $this->circSpot_y = intval(round(($circleSize * $tenCount)+60));
-                else 
+                if ($tenCount > 0)
+                    $this->circSpot_y = intval(round(($circleSize * $tenCount) + 60));
+                else
                     $this->circSpot_y = 60;
 
                 $mainColor  = $tfc["background"];
@@ -555,22 +588,24 @@ class Circle
     //
 
     // Row of theme colored circles
-    public function makeCircleInline($imagine)
+    public function makeCircleInline($imagine, $theme, $themeType)
     {
-        
-        $tfc   = loadThemeFile("base16", false);
+
+        $tfc   = loadThemeFile($themeType, false, $theme);
 
         $palette = new RGB();
 
         $image   = $imagine->create(new Box(self::WALLWIDTH, self::WALLHEIGHT), $palette->color($tfc["background"]));
 
+        //$cBig = intval(round($WALLWIDTHMax / $maxCs));
+
         // Generate Inline Circle Pattern
         $maxCs = count($tfc["colors"]);
         $curCs = 1;
-        $WALLWIDTHMax  = intval(round(self::WALLWIDTH - 200));
-        $circleSize     = intval(round(($WALLWIDTHMax / $maxCs) - 5));
+        $WALLWIDTHMax  = intval(round(self::WALLWIDTH - self::INLINESPACE));
+        $circleSize    = intval(round(($WALLWIDTHMax / $maxCs))); // Small Gap between each circle. 
 
-        outputLog(count($tfc["colors"]) . " circles @ " . $circleSize) . "px each";
+        //outputLog(count($tfc["colors"]) . " circles @ " . $circleSize) . "px each";
 
         foreach ($tfc["colors"] as $themeColor) {
             $tC = $this->inlineCircle($image, $palette, $themeColor, $circleSize, $curCs);
@@ -578,17 +613,17 @@ class Circle
             $curCs++;
         }
 
-        $cwt = "circles_";
+        $cwt = "horizontal_";
 
         $result = $this->saveCircleWallpaper($image, $cwt);
         return $result;
     }
 
     // Random Piles of Circles
-    public function makeCircleComplex($imagine)
+    public function makeCircleComplex($imagine, $themeName, $themeType)
     {
 
-        $theme = loadThemeFile("base16", false);
+        $theme = loadThemeFile($themeType, false, $themeName);
 
         $palette = new RGB();
 
@@ -614,10 +649,10 @@ class Circle
         return $result;
     }
 
-    public function makeBorderBurst($imagine)
+    public function makeBorderBurst($imagine, $themeName, $themeType)
     {
 
-        $theme = loadThemeFile("base16", false);
+        $theme = loadThemeFile($themeType, false, $themeName);
 
         $palette = new RGB();
 
@@ -644,11 +679,11 @@ class Circle
     }
 
     // Row of theme colored circles
-    public function makeCircleRows($imagine, $colorMode = "random")
+    public function makeCircleRows($imagine, $themeName, $themeType, $colorMode = "random")
     {
         //global $imagine;
 
-        $tfc   = loadThemeFile("base16", false);
+        $tfc   = loadThemeFile($themeType, false, $themeName);
 
         $palette = new RGB();
         $image   = $imagine->create(
@@ -666,9 +701,9 @@ class Circle
         return $result;
     }
 
-    public function makeStackedCircle($imagine, $fill=true, $pos=true)
+    public function makeStackedCircle($imagine, $themeName, $themeType, $fill = true, $pos = true)
     {
-        $theme = loadThemeFile("base16", false);
+        $theme   = loadThemeFile($themeType, false, $themeName);
 
         $palette = new RGB();
 
@@ -684,7 +719,7 @@ class Circle
             "colors"  => $theme["colors"]
         );
 
-        if($pos === true){
+        if ($pos === true) {
             $X = intval(round(self::WALLWIDTH * 0.5));
             $Y = intval(round(self::WALLHEIGHT * 1));
         } else {
@@ -692,8 +727,8 @@ class Circle
             $Xmin = intval(round(self::WALLWIDTH * 0.2));
             $Ymax = intval(round(self::WALLHEIGHT * 0.8));
             $Ymin = intval(round(self::WALLHEIGHT * 0.2));
-            $X = intval(rand($Xmin,$Xmax));
-            $Y = intval(rand($Ymin,$Ymax));
+            $X = intval(rand($Xmin, $Xmax));
+            $Y = intval(rand($Ymin, $Ymax));
         }
 
         outputLog("stackedCircle starting....");
@@ -710,14 +745,15 @@ class Circle
 
         //outputLog("mCount" . $mCount . "rCount" . $rCount . " tCount" . $tCount);
         $cwt = "circleStacked_";
+        if ($fill !== true) $cwt = "lineStacked_";
 
         $result = $this->saveCircleWallpaper($image, $cwt);
         return $result;
     }
 
-    public function makeDots($imagine)
+    public function makeDots($imagine, $themeName, $themeType)
     {
-        $theme = loadThemeFile("base16", false);
+        $theme = loadThemeFile($themeType, false, $themeName);
         $palette = new RGB();
 
         $image = $imagine->create(

@@ -4,7 +4,7 @@
 
 > PHP CLI app for messing around with 'Color Palettes', or pretty color combinations. 
 
-![screenshot](./app_screenshot.png)
+![screenshot](./examples/circleBB_KXxt6y._cement-wall._O-15_CKw.png)
 
 Additional description about the project and its features.
 

@@ -57,14 +57,14 @@ class Generator
         return $result;
     }
 
-    public function stackCircleGen($theme = false, $theme_type = false, $shuffle = false, $texture = false, $fill = true, $pos = true)
+    public function stackCircleGen($theme = false, $theme_type = false, $shuffle = false, $texture = false, $params)
     {
         $GenWall = new Circle();
-        $result = $GenWall->makeStackedCircle($this->imagine, $theme, $theme_type, $fill, $pos);
+        $result = $GenWall->makeStackedCircle($this->imagine, $theme, $theme_type, true, true);
         return $result;
     }
 
-    public function stackLineCircleGen($theme = false, $theme_type = false, $shuffle = false, $texture = false)
+    public function stackLineCircleGen($theme = false, $theme_type = false, $shuffle = false, $texture = false, $params)
     {
         $GenWall = new Circle();
         $result = $GenWall->makeStackedCircle($this->imagine, $theme, $theme_type, false, false);

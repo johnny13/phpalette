@@ -180,9 +180,10 @@ class Rectangle
 
 
         // Save Final Wallpaper Image
-        $string_prefix = "recty_";
-        if ($randomPositions === "random") $string_prefix = "randyrecty_";
-        $string = $string_prefix . "__" . $allColors["theme"] . "__";
+        $string_prefix = "recty";
+        if ($randomPositions === "random") $string_prefix = "randy";
+
+        $string = $string_prefix . "_" . $allColors["theme"] . "_";
 
         $result = saveNewWallpaper($image, $string);
 

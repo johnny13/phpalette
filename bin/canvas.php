@@ -12,10 +12,12 @@ declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 
 // CLI HELPERS
-use PhpSchool\CliMenu\CliMenu;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
+use PhpSchool\CliMenu\CliMenu;
 use PhpSchool\CliMenu\MenuItem\AsciiArtItem;
-use PhpSchool\CliMenu\Action\GoBackAction;
+use PhpSchool\CliMenu\MenuStyle;
+use PhpSchool\CliMenu\Input\Text;
+use PhpSchool\CliMenu\Input\InputIO;
 
 use League\CLImate;
 
@@ -308,7 +310,7 @@ function menuFinalizedGenWallpapers($theme, $theme_type, $shuffle, $texture)
     }
 
     // OUTPUT SOME MENU SHIT
-    $climate->addArt('ascii');
+    $climate->addArt('assets/ascii');
     genWallTodoUI($climate, $theme, $theme_type, $wjd, $runtilldat, true, false);
 
     $progress = $climate->progress()->total(100);
@@ -414,7 +416,7 @@ function runTillData($theme, $theme_type, $shuffle, $texture, $funs, $i)
  */
 function cliMenuDisplay($wpapers)
 {
-    global $wallpapers, $wp_selected_themes, $mainMenu;
+    global $wallpapers, $wp_selected_themes, $mainMenu, $shuffleMode, $textureMode;
 
     $wallpapers = $wpapers["Wallpapers"];
 
@@ -424,10 +426,45 @@ function cliMenuDisplay($wpapers)
     $disk_used   = humanFilesize($du);
     $countWalls  = folderItemCount("out/walls");
     $countThemes = folderItemCount("out/themes");
+    $shuffleMode = false;
+    $textureMode = false;
 
-    $art = file_get_contents("./ascii/spaceman.txt");
+    $art = file_get_contents("./assets/ascii/spaceman.txt");
 
     // Handels User Selection
+    $itemCallable = function (CliMenu $menu) {
+
+        $style = (new MenuStyle())
+            ->setBg('yellow')
+            ->setFg('black');
+
+        $input = new class(new InputIO($menu, $menu->getTerminal()), $style) extends Text
+        {
+            public function validate(string $value): bool
+            {
+                //some validation
+                return true;
+            }
+        };
+
+        $result = $input->ask();
+
+        var_dump($result->fetch());
+    };
+
+
+    $wallOptsCallable = function (CliMenu $mainMenu) {
+        global $shuffleMode, $textureMode;
+
+        $opt    = $mainMenu->getSelectedItem()->getText();
+        $search = "shuffle";
+
+        if (preg_match("/{$search}/i", $opt))
+            $shuffleMode = ($shuffleMode == true) ? false : true;
+        else
+            $textureMode = ($textureMode == true) ? false : true;
+    };
+
     $themeNewCallable = function (CliMenu $mainMenu) {
         echo $mainMenu->getSelectedItem()->getText();
     };
@@ -479,9 +516,9 @@ function cliMenuDisplay($wpapers)
         $menu->close();
 
         // Set Theme File Info for Wallpaper Generators...
-        $content = "base16," . $wp_selected_theme . "," . $shuffle . "," . $texture;
-        $name = "colorParams.txt";
-        blastedFile($name, $content);
+        // $content = "base16," . $wp_selected_theme . "," . $shuffle . "," . $texture;
+        // $name = "colorParams.txt";
+        // blastedFile($name, $content);
 
         menuFinalizedGenWallpapers($wp_selected_theme, "base16", $shuffle, $texture);
     };
@@ -490,7 +527,7 @@ function cliMenuDisplay($wpapers)
     $mainMenu = ($builder = new CliMenuBuilder)
         ->addAsciiArt($art, AsciiArtItem::POSITION_CENTER, "  --  BLASTED  --")
         ->setTitleSeparator('nu')
-        ->addSubMenu('Generate Wallpaper(s)', function (CliMenuBuilder $b) use ($wallpaperCallable, $colorCallable) {
+        ->addSubMenu('Generate Wallpaper(s)', function (CliMenuBuilder $b) use ($wallpaperCallable, $colorCallable, $wallOptsCallable, $itemCallable) {
 
             global $wallpapers;
 
@@ -505,7 +542,7 @@ function cliMenuDisplay($wpapers)
                 $b->addLineBreak(' ');
             }
 
-            $b->addSubMenu('Next Step ->', function (CliMenuBuilder $c) use ($colorCallable) {
+            $b->addSubMenu('Next Step ->', function (CliMenuBuilder $c) use ($colorCallable, $wallOptsCallable, $itemCallable) {
 
                 $c->setTitle('Select Color Palette')
                     ->addLineBreak(' ')
@@ -531,24 +568,30 @@ function cliMenuDisplay($wpapers)
                         $d->addLineBreak(' ');
                     })
                     ->addLineBreak(' ')
-                    ->addItem('Manually Enter', function (CliMenu $menu) {
-                        echo sprintf('Executing option: %s', $menu->getSelectedItem()->getText());
+                    ->addSubMenu('Create New Theme', function (CliMenuBuilder $g) use ($itemCallable) {
+                        $g->setTitle('Input up to 8 CSS value(s) + Background CSS color')
+                            ->setTitleSeparator('|| [] ')
+                            ->setPadding(2, 4)
+                            ->setMarginAuto()
+                            ->setForegroundColour('51')
+                            ->setBackgroundColour('240');
+                        $g->addLineBreak(' ');
+                        $g->addItems([["First Color", $itemCallable], ["Second Color", $itemCallable], ["Third Color", $itemCallable], ["Fourth Color", $itemCallable], ["Fifth Color", $itemCallable], ["Sixth Color", $itemCallable], ["Seventh Color", $itemCallable], ["Eighth Color", $itemCallable]]);
+                        $g->addLineBreak(' ');
+                        $g->addItem("Background Color", $itemCallable);
+                        $g->addLineBreak(' ');
                     })
                     ->addLineBreak(' ');
             })
                 ->addLineBreak(' ');
 
-            $b->addSubMenu('Options', function (CliMenuBuilder $e) {
+            $b->addSubMenu('Options', function (CliMenuBuilder $e) use ($wallOptsCallable) {
                 $e->setTitle('WALLPAPER OPTIONS')
                     ->addLineBreak(' ')
                     ->addLineBreak(' ')
-                    ->addItem('SHUFFLE COLORS? (default: false)', function (CliMenu $menu) {
-                        echo sprintf('SETTING OPTION: %s', $menu->getSelectedItem()->getText());
-                    })
+                    ->addCheckboxItem('Shuffle theme colors?', $wallOptsCallable)
                     ->addLineBreak(' ')
-                    ->addItem('APPLY TEXTURE? (default: false)', function (CliMenu $menu) {
-                        echo sprintf('SETTING OPTION: %s', $menu->getSelectedItem()->getText());
-                    })
+                    ->addCheckboxItem('Apply a textured overlay to final result(s)?', $wallOptsCallable)
                     ->addLineBreak(' ')
                     ->addLineBreak('-');
             })
@@ -565,25 +608,11 @@ function cliMenuDisplay($wpapers)
         ->addLineBreak(' ')
         ->addItem('Color Explorer', $explorerCallable)
         ->addLineBreak(' ')
-        ->addLineBreak('-')
-        ->addSubMenu('Options', function (CliMenuBuilder $e) {
-            $e->setTitle('WALLPAPER OPTIONS')
-                ->addLineBreak(' ')
-                ->addLineBreak(' ')
-                ->addItem('SHUFFLE COLORS? (default: false)', function (CliMenu $menu) {
-                    echo sprintf('SETTING OPTION: %s', $menu->getSelectedItem()->getText());
-                })
-                ->addLineBreak(' ')
-                ->addItem('APPLY TEXTURE? (default: false)', function (CliMenu $menu) {
-                    echo sprintf('SETTING OPTION: %s', $menu->getSelectedItem()->getText());
-                })
-                ->addLineBreak(' ')
-                ->addLineBreak('-');
-        })
         ->setPadding(2, 4)
         ->setMarginAuto()
         ->setForegroundColour('51')
         ->setBackgroundColour('240')
+        ->setWidth(intval($builder->getTerminal()->getWidth() - 20))
         ->build();
 
     $mainMenu->open();
@@ -694,7 +723,7 @@ function loadThemeFile($type = "base16", $shuffle = true, $name = false)
 {
     $colors = array();
     $file   = "";
-
+    //outputLog($name);
     $bgColor = backgroundColor("dark");
 
     if ($type === "base16") {
@@ -702,17 +731,17 @@ function loadThemeFile($type = "base16", $shuffle = true, $name = false)
         if ($name === false) {
             $themes = array();
 
-            foreach (glob("./colors/*.{yaml,yml,YAML,YML}", GLOB_BRACE) as $filename) {
+            foreach (glob("./assets/colors/*.{yaml,yml,YAML,YML}", GLOB_BRACE) as $filename) {
                 $themes[] = $filename;
             }
             shuffle($themes);
 
             $name = "random";
             $file = $themes[0];
-            $display_name = basename($file, "yaml");
+            $display_name = basename($file, ".yaml");
         } else {
-            $file = "./colors/" . $name . ".yaml";
-            $display_name = basename($file, "yaml");
+            $file = "./assets/colors/" . $name . ".yaml";
+            $display_name = basename($file, ".yaml");
         }
 
         outputLog("     <green>THEME</green> <light_blue>" . $display_name . "</light_blue>");
@@ -740,7 +769,7 @@ function loadThemeFile($type = "base16", $shuffle = true, $name = false)
 
     $contents = array($display_name, $file, $shuffle, $bgColor);
     $content = implode(" , ", $contents);
-    blastedFile("log.txt", $content);
+    //blastedFile("log.txt", $content);
     $final = array("colors" => $colors, "background" => $bgColor, "theme" => $display_name);
     return $final;
 }
@@ -754,7 +783,7 @@ function loadAllBaseThemes()
 {
     $themes = array();
 
-    foreach (glob("./colors/*.{yaml,yml,YAML,YML}", GLOB_BRACE) as $filename) {
+    foreach (glob("./assets/colors/*.{yaml,yml,YAML,YML}", GLOB_BRACE) as $filename) {
         $themes[] = $filename;
     }
 
@@ -829,7 +858,7 @@ function avatarIconGen()
 {
     $GenShape = new Shapes();
     $avatar = new LasseRafn\InitialAvatarGenerator\InitialAvatar();
-    $image = $avatar->glyph('f6e2')->font('fonts/Font-Awesome-5-Free-Solid-900.otf')->color('#e0e0e0')->background('#4f4f4f')->size(256)->fontSize(0.75)->smooth()->generate();
+    $image = $avatar->glyph('f6e2')->font('assets/fonts/Font-Awesome-5-Free-Solid-900.otf')->color('#e0e0e0')->background('#4f4f4f')->size(256)->fontSize(0.75)->smooth()->generate();
     return $image->save('examples/avatar.png');
 }
 
@@ -852,15 +881,15 @@ function rasterGrungeGen()
 // Turn image into greyscale version (used in textures)
 function makeGreyscale()
 {
-    if (!is_dir("./images/1920x1080/")) {
-        if (!mkdir("./images/1920x1080/", 0777, true)) {
+    if (!is_dir("./assets/images/1920x1080/")) {
+        if (!mkdir("./assets/images/1920x1080/", 0777, true)) {
             die('Failed to create folders...');
         }
     }
 
     $image = new \claviska\SimpleImage();
 
-    $dir = "images";
+    $dir = "assets/images";
     $typeString = "jpeg,jpg";
     $textures = directoryToArray($dir, $typeString);
 
@@ -869,7 +898,7 @@ function makeGreyscale()
 
         $bname = basename($img);
 
-        if (file_exists("images/1920x1080/" . $bname)) {
+        if (file_exists("assets/images/1920x1080/" . $bname)) {
             outPutLog("Already Processed " . $bname);
         } else {
 
@@ -882,7 +911,7 @@ function makeGreyscale()
                 ->fromFile($img)
                 ->resize(1920, 1080)
                 ->desaturate()
-                ->toFile("images/1920x1080/" . $stripped . ".png", 'image/png');
+                ->toFile("assets/images/1920x1080/" . $stripped . ".png", 'image/png');
         }
     }
 

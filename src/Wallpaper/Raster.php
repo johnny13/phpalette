@@ -13,14 +13,16 @@ class Raster
 {
 
     const OUTDIR       = 'out/walls/';
-    const TEXTUREDIR   = 'images/';
+    const TEXTUREDIR   = 'assets/images/';
     const THUMBDIR     = 'out/wall_thumbs/';
-    const GREYTEXTDIR  = "images/1920x1080/";
-    const FILTTEXTDIR  = "images/1920x1080_filtered/";
+    const GREYTEXTDIR  = "assets/images/1920x1080/";
+    const FILTTEXTDIR  = "assets/images/1920x1080_filtered/";
+    const PAINTEMPDIR  = "assets/images/paint_splatters/";
     const WALLWIDTH    = 1920;
     const WALLHEIGHT   = 1080;
     const THUMBWIDTH   = 800;
     const THUMBHEIGHT  = 600;
+    const GRUNGEOPAC   = 0.15;
 
     // General Save & Thumbnail Function
     public function saveRasterWallpaper($wallpaperImage, $nameString, $savedir = self::OUTDIR, $skip = false)
@@ -48,8 +50,20 @@ class Raster
         return array("image" => $result);
     }
 
+    /**
+     * makeGrunge
+     *
+     * @param Imagine::object $image
+     * @return array of arrays containing created wallpaper paths
+     * 
+     * @todo figure out a method for what wallpapers will get the grunge overlay
+     * @todo add an option for only applying certain grunge overlays
+     *
+     */
     public function makeGrunge($image)
     {
+        $finalArray = array();
+
         $walls = array("rr_F4RaW.png", "dots_YQ6fTz.png", "circleRowRandom_Wa3FQE.png", "circles_A8agWC.png", "circleBB_KXxt6y.png", "circleStacked_QHrwKR.png", "circleComp_aexfEz.png", "circleRow_xPTkYZ.png");
 
         $textures = array();
@@ -64,18 +78,20 @@ class Raster
                 $image
                     ->fromFile(self::OUTDIR . $wall)
                     ->autoOrient()
-                    ->overlay($texture, "center", 0.15);
+                    ->overlay($texture, "center", self::GRUNGEOPAC);
 
-                $this->saveRasterWallpaper($image, $wname . "_" . $bname . "_O-15_");
+                $finalArray[] = $this->saveRasterWallpaper($image, $wname . "_" . $bname);
             }
         }
+
+        return $finalArray;
     }
 
     public function loadTextures()
     {
         $textures = array();
 
-        foreach (glob("images/1920x1080_filtered/*.{png,PNG}", GLOB_BRACE) as $filename) {
+        foreach (glob(self::FILTTEXTDIR . "/*.{png,PNG}", GLOB_BRACE) as $filename) {
             $textures[] = $filename;
             //outputLog("File: " . $filename);
         }
@@ -90,7 +106,7 @@ class Raster
     {
         $textures = array();
 
-        foreach (glob("images/paint_splatters/*.{png,PNG}", GLOB_BRACE) as $filename) {
+        foreach (glob(self::PAINTEMPDIR . "*.{png,PNG}", GLOB_BRACE) as $filename) {
             $textures[] = $filename;
         }
 
@@ -101,11 +117,9 @@ class Raster
 
     public function makeReady($image)
     {
-        if (!is_dir(self::FILTTEXTDIR)) {
-            if (!mkdir(self::FILTTEXTDIR, 0777, true)) {
+        if (!is_dir(self::FILTTEXTDIR))
+            if (!mkdir(self::FILTTEXTDIR, 0777, true))
                 die('Failed to create folders...');
-            }
-        }
 
         $dir = self::GREYTEXTDIR;
         $typeString = "png,PNG";
